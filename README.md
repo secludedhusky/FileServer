@@ -9,8 +9,8 @@ Simple file server for ShareX
 Configuration required for .env (Create the file locally, don't commit it!)
 * APP_PORT=3030
 * DB_HOST=localhost
-* DB_USER=<username>
-* DB_PASS=<username>
+* DB_USER=Enter your username
+* DB_PASS=Enter your password
 * DB_DATABASE=sharex_server
 * UPLOAD_TABLE_V1=uploads
 * VIEW_TABLE_V1=views
