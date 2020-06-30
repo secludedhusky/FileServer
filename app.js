@@ -27,5 +27,9 @@ app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
     app.use(router);
     app.listen(port, function () {
         console.log(`Server is listening for connection.`);
+
+        app.get("/", (req, res) => {
+            res.send("Hello, world!");
+        });
     });
 })();
