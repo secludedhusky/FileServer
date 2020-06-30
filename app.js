@@ -25,7 +25,7 @@ app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
 // Start App
 (async function () {
     app.use(router);
-    app.listen(port, function () {
-        console.log(`Server is listening on port: ${port}`);
+    app.listen("app.sock", function () {
+        console.log(`Server is listening for connection.`);
     });
 })();
