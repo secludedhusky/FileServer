@@ -36,7 +36,6 @@ class FileGet {
             view_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
             view_id: fileId
         })
-            .then((r) => { console.log(r); })
             .catch((error) => { console.error(error); });
 
         if (RegEx.exec(fileId)) {

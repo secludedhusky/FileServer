@@ -57,7 +57,7 @@ class FileUpload {
                                 .send({
                                     status: 200,
                                     data: {
-                                        link: `http://${req.hostname}${process.env.APP_PORT === 80 || process.env.APP_PORT === 443 ? "" : `:${process.env.APP_PORT}`}${process.env.API_V1}/${requestId}`
+                                        link: `https://${req.hostname}${process.env.API_V1}/${requestId}`
                                     }
                                 });
                         })
