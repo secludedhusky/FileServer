@@ -75,8 +75,6 @@ class FileGet {
                     message: `No file found with id: ${id}`
                 });
         }
-
-        Promise.resolve(promises);
     }
 
     GetRoutes() {
