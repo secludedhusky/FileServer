@@ -31,7 +31,7 @@ CREATE TABLE `uploads` (
   `upload_mime` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `upload_id_UNIQUE` (`upload_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -43,4 +43,4 @@ CREATE TABLE `uploads` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-06-30 15:17:17
+-- Dump completed on 2020-06-30 15:36:09
