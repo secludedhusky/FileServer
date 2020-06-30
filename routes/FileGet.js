@@ -24,20 +24,25 @@ class FileGet {
                 .then((r) => {
                     let fileData = r[0];
                     let file = fs.createReadStream(fileData.upload_path);
+
                     res
                         .status(200)
                         .set({
                             "Content-Type": `${fileData.upload_mime}`,
                             "Content-Disposition": `filename="${fileData.upload_filename}"`
                         });
-
                     file.pipe(res);
-                    console.log("Sent file");
 
                     database.insert(process.env.VIEW_TABLE_V1, {
                         view_data: JSON.stringify({ hello: "world" }),
                         view_date: "CURRENT_TIMESTAMP"
-                    });
+                    })
+                        .then((r) => {
+                            console.log(r);
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
                 })
                 .catch((error) => {
                     console.error(error);
@@ -53,7 +58,7 @@ class FileGet {
                 .status(404)
                 .send({
                     status: 404,
-                    message: `No file found with the ID ${id}`
+                    message: `No file found with id: ${id}`
                 });
         }
     }

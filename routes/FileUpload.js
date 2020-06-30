@@ -75,7 +75,7 @@ class FileUpload {
                                 status: 500,
                                 message: error.message
                             });
-                            console.error("File upload was successful, but failed to log to the database.", "\nError:", error, "\nFile:", {newFilename: newFilename, fileExt: fileExt, filePath: filePath, fileMime: fileMime, requestId: requestId});
+                            console.error("Upload successful, but the file was not recorded in the DB.", "\nError:", error, "\nFile:", {newFilename: newFilename, fileExt: fileExt, filePath: filePath, fileMime: fileMime, requestId: requestId});
                         });
                 });
             } catch (error) {
