@@ -22,7 +22,6 @@ class FileGet {
                 headers: req.headers,
                 rawHeaders: req.rawHeaders,
                 httpVersion: req.httpVersion,
-                host: req.host,
                 hostname: req.hostname,
                 params: req.params,
                 ip: req.ip,
