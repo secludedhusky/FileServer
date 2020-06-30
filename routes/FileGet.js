@@ -35,7 +35,7 @@ class FileGet {
 
                     database.insert(process.env.VIEW_TABLE_V1, {
                         view_data: JSON.stringify({ hello: "world" }),
-                        view_date: "CURRENT_TIMESTAMP"
+                        view_date: new Date().toISOString().slice(0, 19).replace('T', ' ')
                     })
                         .then((r) => {
                             console.log(r);
