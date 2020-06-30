@@ -21,6 +21,7 @@ const GetFile = require("./routes/FileGet");
 
 app.use(`${process.env.API_V1}`, new UploadFile().GetRoutes());
 app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
+app.use(express.static(process.env.PUBLIC_HTML));
 
 // Start App
 (async function () {
