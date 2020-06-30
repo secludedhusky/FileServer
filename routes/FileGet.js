@@ -35,7 +35,8 @@ class FileGet {
                     console.log("Sent file");
 
                     database.insert(process.env.VIEW_TABLE_V1, {
-
+                        view_data: JSON.stringify({ hello: "world" }),
+                        view_date: "CURRENT_TIMESTAMP"
                     });
                 })
                 .catch((error) => {
