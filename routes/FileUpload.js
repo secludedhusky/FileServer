@@ -9,13 +9,7 @@ const { v4: uuid } = require("uuid");
 class FileUpload {
 
     constructor() {
-        database.connect()
-            .then((r) => {
-                console.log(`${this.constructor.name}: Connected to database.`);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+
     }
 
     /**
@@ -30,7 +24,7 @@ class FileUpload {
                 console.log("Uploading:", filename);
 
                 let requestId = uuid();
-                
+
                 let fileExt = path.extname(filename);
                 let newFilename = `${requestId}${fileExt}`;
                 let filePath = `${__dirname}/public/${newFilename}`;
@@ -41,8 +35,7 @@ class FileUpload {
 
                 stream.on('error', (error) => {
                     console.log(error);
-                    res
-                        .status(500)
+                    res.status(500)
                         .send({
                             status: 500,
                             message: `An error occured: ${error.message}`
@@ -51,18 +44,16 @@ class FileUpload {
 
                 stream.on('close', function () {
                     console.log("Uploaded: ", filename);
-                    
-                    database.insert(process.env.UPLOAD_TABLE_V1, { 
-                        upload_id: requestId, 
-                        upload_path: filePath, 
+
+                    database.insert(process.env.UPLOAD_TABLE_V1, {
+                        upload_id: requestId,
+                        upload_path: filePath,
                         upload_user: "todo",
                         upload_filename: filename,
                         upload_mime: fileMime
                     })
                         .then((r) => {
-                            res
-                                .set({ "Content-Type": "application/json" })
-                                .status(200)
+                            res.set({ "Content-Type": "application/json" }).status(200)
                                 .send({
                                     status: 200,
                                     data: {
@@ -71,19 +62,21 @@ class FileUpload {
                                 });
                         })
                         .catch((error) => {
-                            res.status(500).send({
-                                status: 500,
-                                message: error.message
-                            });
-                            console.error("Upload successful, but the file was not recorded in the DB.", "\nError:", error, "\nFile:", {newFilename: newFilename, fileExt: fileExt, filePath: filePath, fileMime: fileMime, requestId: requestId});
+                            res.status(500)
+                                .send({
+                                    status: 500,
+                                    message: error.message
+                                });
+                            console.error("Upload successful, but the file was not recorded in the DB.", "\nError:", error, "\nFile:", { newFilename: newFilename, fileExt: fileExt, filePath: filePath, fileMime: fileMime, requestId: requestId });
                         });
                 });
             } catch (error) {
                 console.log(error);
-                res.status(500).send({
-                    status: 500,
-                    message: error.message
-                });
+                res.status(500)
+                    .send({
+                        status: 500,
+                        message: error.message
+                    });
             }
         });
     }
