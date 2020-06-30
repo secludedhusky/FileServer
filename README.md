@@ -1,14 +1,17 @@
 # FileServer
 Simple file server for ShareX
 
-# .env
-APP_PORT=3030
-DB_HOST=localhost
-DB_USER=<username>
-DB_PASS=<username>
-DB_DATABASE=sharex_server
+# Setup
+1) npm install
+2) npm start
 
-UPLOAD_TABLE_V1=uploads
-VIEW_TABLE_V1=views
-
-API_V1=/api/v1
+# Environment Configuration
+Configuration required for .env (Create the file locally, don't commit it!)
+* APP_PORT=3030
+* DB_HOST=localhost
+* DB_USER=<username>
+* DB_PASS=<username>
+* DB_DATABASE=sharex_server
+* UPLOAD_TABLE_V1=uploads
+* VIEW_TABLE_V1=views
+* API_V1=/api/v1
