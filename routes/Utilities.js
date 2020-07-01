@@ -19,8 +19,22 @@ class Utilities extends RouteBase {
             });
     }
 
-    async getStats(req, res) {
+    async getFileCount(req, res) {
         database.select("COUNT(id) as files", process.env.UPLOAD_TABLE_V1)
+            .then((r) => {
+                res.set({ "Content-Type": "application/json" }).status(200)
+                    .send({
+                        status: 200,
+                        message: r
+                    });
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+    
+    async getViewCount(req, res) {
+        database.select("COUNT(id) as views", process.env.VIEW_TABLE_V1)
             .then((r) => {
                 res.set({ "Content-Type": "application/json" }).status(200)
                     .send({
@@ -38,7 +52,8 @@ class Utilities extends RouteBase {
             var router = require("express").Router();
 
             router.get("/version", this.getVersion);
-            router.get("/stats", this.getStats);
+            router.get("/stats", this.getFileCount);
+            router.get("/views", this.getViewCount);
 
             return router;
         })();
