@@ -4,8 +4,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-let helpers = require('./node.helpers.js');
-
 module.exports = {
     mode: "development",
     entry: './src/index.js',

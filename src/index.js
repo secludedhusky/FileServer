@@ -1,32 +1,25 @@
 // Imports
 import Vue from "vue";
-import VueRouter from "vue-router";
-import VueMaterial from "vue-material";
-
-// Vue uses
-Vue.use(VueRouter);
-Vue.use(VueMaterial);
+import * as VueMaterial from "vue-material"; // Lazy
 
 // Components
-import App from "./components/App.vue";
+import App from "./components/pages/App.vue";
+
+// Router
+import router from './router.js';
+
+// Vue Uses
+Vue.use(VueMaterial.default);
 
 // CSS
 import 'vue-material/dist/vue-material.min.css'
 
-const routes = [
-    { path: '/', component: App }
-]
-
-const router = new VueRouter({
-    routes
-})
-
+// Main Ap
 let app = new Vue({
-    el: "#app",
-    router: router,
-    render: h => h(App, {
-        props: {
-            message: "File Uploader"
-        }
-    })
-});
+    components: { App },
+    router,
+    template: "<App/>",
+    propsData: {
+        pageTitle: "Uploader"
+    }
+}).$mount("#app");
