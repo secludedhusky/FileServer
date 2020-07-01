@@ -57,7 +57,7 @@ class FileUpload {
                                 .send({
                                     status: 200,
                                     data: {
-                                        link: `https://${req.hostname}${process.env.API_V1}/${requestId}`
+                                        link: `${(process.env.NODE_ENV === "production" ? "https" : `http`)}://${req.hostname}${(process.env.NODE_ENV === "production" ? "" : `:${process.env.APP_PORT}`)}${process.env.API_V1}/${requestId}`
                                     }
                                 });
                         })
@@ -67,7 +67,7 @@ class FileUpload {
                                     status: 500,
                                     message: error.message
                                 });
-                            console.error("Upload successful, but the file was not recorded in the DB.", "\nError:", error, "\nFile:", { newFilename: newFilename, fileExt: fileExt, filePath: filePath, fileMime: fileMime, requestId: requestId });
+                            console.error("Upload successful, but the file was not recorded in the DB.", error);
                         });
                 });
             } catch (error) {

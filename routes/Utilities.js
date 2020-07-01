@@ -1,5 +1,7 @@
-const GitInfo = require('git-repo-info');
+const Database = require("../lib/database-manager");
+const database = new Database(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
+const GitInfo = require('git-repo-info');
 const gitInfo = GitInfo();
 
 class Utilities {
@@ -7,7 +9,25 @@ class Utilities {
     constructor() { }
 
     async getVersion(req, res) {
-        res.send(gitInfo.sha);
+        res.set({ "Content-Type": "application/json" }).status(200)
+        .send({
+            status: 200,
+            message: [{version: gitInfo.sha}]
+        });
+    }
+
+    async getStats(req, res) {
+        database.select("COUNT(id) as files", process.env.UPLOAD_TABLE_V1)
+            .then((r) => {
+                res.set({ "Content-Type": "application/json" }).status(200)
+                    .send({
+                        status: 200,
+                        message: r
+                    });
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     }
 
     GetRoutes() {
@@ -15,6 +35,7 @@ class Utilities {
             var router = require("express").Router();
 
             router.get("/version", this.getVersion);
+            router.get("/stats", this.getStats);
 
             return router;
         })();

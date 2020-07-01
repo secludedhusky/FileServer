@@ -36,8 +36,11 @@
                     </form>
                 </div>
             </div>
-            <div class="row center-align">
-                App Version: <span id="app-version">...</span>
+            <div class="row">
+                <ul class="collection">
+                    <li class="collection-item">Version: <span class="badge" id="app-version">...</span></li>
+                    <li class="collection-item">Files: <span class="badge" id="app-files">...</span></li>
+                  </ul>
             </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -47,7 +50,13 @@
                 await fetch("/api/v1/utilities/version")
                     .then(async (r) => {
                         if (r.ok) {
-                            document.querySelector("#app-version").innerText = await r.text();
+                            document.querySelector("#app-version").innerText = (await r.json()).message[0].version;
+                        }
+                    });
+                await fetch("/api/v1/utilities/stats")
+                    .then(async (r) => {
+                        if (r.ok) {
+                            document.querySelector("#app-files").innerText = (await r.json()).message[0].files;
                         }
                     });
             })();

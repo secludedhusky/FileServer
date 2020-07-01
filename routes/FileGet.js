@@ -2,7 +2,6 @@ const Database = require("../lib/database-manager");
 const database = new Database(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
 const RegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-
 const fs = require('fs-extra');
 
 class FileGet {
@@ -70,10 +69,11 @@ class FileGet {
             res.set({ "Content-Type": "application/json" }).status(404)
                 .send({
                     status: 404,
-                    message: `No file found with id: ${id}`
+                    message: `No file found with id: ${fileId}`
                 });
         }
     }
+
 
     GetRoutes() {
         return (() => {
