@@ -1,5 +1,6 @@
 // Modules
 const express = require("express");
+const path = require("path");
 const BodyParser = require('body-parser');
 const ConnectBusboy = require('connect-busboy');
 
@@ -26,7 +27,8 @@ app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
 app.use(`${process.env.API_V1}/utilities`, new Utilities().GetRoutes());
 app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());
 
-app.use(express.static(process.env.PUBLIC_HTML));
+console.log(path.join(__dirname, "../dist"));
+app.use(express.static(path.join(__dirname, "../dist")));
 
 // Start App
 (async function () {
