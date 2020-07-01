@@ -17,18 +17,18 @@ app.use(BodyParser.json());
 app.use(ConnectBusboy());
 
 // Middleware
-const UploadFile = require("./routes/FileUpload");
-const GetFile = require("./routes/FileGet");
-const Utilities = require("./routes/Utilities");
-const Authentication = require("./routes/Authentication");
+const UploadFile = require("./server/routes/FileUpload");
+const GetFile = require("./server/routes/FileGet");
+const Utilities = require("./server/routes/Utilities");
+const Authentication = require("./server/routes/Authentication");
 
 app.use(`${process.env.API_V1}`, new UploadFile().GetRoutes());
 app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
 app.use(`${process.env.API_V1}/utilities`, new Utilities().GetRoutes());
 app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());
 
-console.log(path.join(__dirname, "../dist"));
-app.use(express.static(path.join(__dirname, "../dist")));
+console.log(path.join(__dirname, "dist"));
+app.use(express.static(path.join(__dirname, "dist")));
 
 // Start App
 (async function () {
