@@ -13,13 +13,11 @@ Vue.use(VueMaterial.default);
 
 // CSS
 import 'vue-material/dist/vue-material.min.css'
+import 'vue-material/dist/theme/default.css'
 
 // Main Ap
 let app = new Vue({
     components: { App },
     router,
-    template: "<App/>",
-    propsData: {
-        pageTitle: "Uploader"
-    }
+    template: "<App/>"
 }).$mount("#app");

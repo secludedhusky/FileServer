@@ -13,9 +13,6 @@
 <script>
 export default {
     name: "home-page",
-    props: {
-        pageTitle: String
-    },
     methods: {
         navigate(page) {
             if(this.$router.history.current.name !== page) {

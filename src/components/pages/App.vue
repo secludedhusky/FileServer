@@ -5,22 +5,28 @@
             <md-button v-on:click="navigate('home')">Home</md-button>
             <md-button v-on:click="navigate('login')">Login</md-button>
         </md-toolbar>
-        <router-view></router-view>
+
+        <md-content>
+            <router-view></router-view>
+        </md-content>
     </div>
 </template>
 
 <script>
 export default {
     name: "home-page",
-    props: {
-        pageTitle: String
-    },
     methods: {
         navigate(page) {
-            if(this.$router.history.current.name !== page) {
+            if (this.$router.history.current.name !== page) {
                 this.$router.push(page);
             }
         }
     }
 };
 </script>
+
+<style>
+.md-content {
+    padding: 32px;
+}
+</style>
