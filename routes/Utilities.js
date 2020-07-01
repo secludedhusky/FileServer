@@ -1,19 +1,22 @@
+const RouteBase = require("./RouteBase");
 const Database = require("../lib/database-manager");
 const database = new Database(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
 const GitInfo = require('git-repo-info');
 const gitInfo = GitInfo();
 
-class Utilities {
+class Utilities extends RouteBase {
 
-    constructor() { }
+    constructor() {
+        super();
+    }
 
     async getVersion(req, res) {
         res.set({ "Content-Type": "application/json" }).status(200)
-        .send({
-            status: 200,
-            message: [{version: gitInfo.sha}]
-        });
+            .send({
+                status: 200,
+                message: [{ version: gitInfo.sha }]
+            });
     }
 
     async getStats(req, res) {

@@ -1,3 +1,4 @@
+<!-- TESTING FRAMEWORK - TODO: React/Angular/Vue, whatever framework seems best tbh :weary: -->
 <!DOCTYPE html>
 <html>
 
@@ -15,35 +16,38 @@
         <div class="container">
             <div class="row">
                 <div class="row">
-                    <form class="col s12">
-                        <div class="row">
-                            <div class="input-field col s5">
-                                <i class="material-icons prefix">account_circle</i>
-                                <input id="icon_prefix" type="text" class="validate">
-                                <label for="icon_prefix">Username</label>
-                            </div>
-                            <div class="input-field col s5">
-                                <i class="material-icons prefix">lock</i>
-                                <input id="password" type="password" class="validate">
-                                <label for="password">Password</label>
-                            </div>
-                            <div class="input-field col s2">
-                                <button class="btn waves-effect waves-light" type="submit" name="action">Submit
-                                    <i class="material-icons right">send</i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    <div class="input-field col s6">
+                        <i class="material-icons prefix">account_circle</i>
+                        <input id="input-username" type="text" class="validate">
+                        <label for="input-username">Username</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <i class="material-icons prefix">lock</i>
+                        <input id="input-password" type="password" class="validate">
+                        <label for="input-password">Password</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12 center-align">
+                        <button class="btn waves-effect waves-light" id="button-login">
+                            Login
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="row">
                 <ul class="collection">
                     <li class="collection-item">Version: <span class="badge" id="app-version">...</span></li>
                     <li class="collection-item">Files: <span class="badge" id="app-files">...</span></li>
-                  </ul>
+                </ul>
             </div>
         </div>
+
+        <!-- Material design :feelsgoodman: -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+        <!-- Ugly inline scripts -->
         <script>
             // Hacky late-night version check just for my sanity!
             (async () => {
@@ -60,6 +64,32 @@
                         }
                     });
             })();
+
+            // Simple login test
+            document.querySelector("#button-login").addEventListener("click", async (event) => {
+                let user = document.querySelector("#input-username").value;
+                let pass = document.querySelector("#input-password").value; // TODO: Client-side encryption pls
+
+                await fetch("/api/v1/auth/login", {
+                    method: "POST",
+                    body: {
+                        user: user,
+                        pass: pass
+                    }
+                })
+                    .then(async (r) => {
+                        if (r.ok) {
+                            let response = (await r.json());
+                            M.toast({ html: 'Successfully logged in', classes: 'rounded teal' });
+                        } else {
+                            M.toast({ html: 'Failed to login, invalid credentials', classes: 'rounded red' });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        M.toast({ html: 'Server error, please try again later', classes: 'rounded red' });
+                    })
+            });
         </script>
     </body>
 

@@ -1,3 +1,4 @@
+const RouteBase = require("./RouteBase");
 const Database = require("../lib/database-manager");
 const database = new Database(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
@@ -5,11 +6,10 @@ const path = require('path');
 const fs = require('fs-extra');
 const mime = require("mime-types");
 const { v4: uuid } = require("uuid");
-
-class FileUpload {
+class FileUpload extends RouteBase {
 
     constructor() {
-
+        super();
     }
 
     /**

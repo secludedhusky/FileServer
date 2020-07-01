@@ -19,10 +19,13 @@ app.use(ConnectBusboy());
 const UploadFile = require("./routes/FileUpload");
 const GetFile = require("./routes/FileGet");
 const Utilities = require("./routes/Utilities");
+const Authentication = require("./routes/Authentication");
 
 app.use(`${process.env.API_V1}`, new UploadFile().GetRoutes());
 app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
 app.use(`${process.env.API_V1}/utilities`, new Utilities().GetRoutes());
+app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());
+
 app.use(express.static(process.env.PUBLIC_HTML));
 
 // Start App

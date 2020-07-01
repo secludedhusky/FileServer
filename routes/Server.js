@@ -1,4 +1,4 @@
 class Server {
-    constructor () {
+    constructor() {
     }
 }

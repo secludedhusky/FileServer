@@ -1,13 +1,14 @@
+const RouteBase = require("./RouteBase");
 const Database = require("../lib/database-manager");
 const database = new Database(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
 const RegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 const fs = require('fs-extra');
 
-class FileGet {
+class FileGet extends RouteBase {
 
     constructor() {
-
+        super();
     }
 
     async getFile(req, res) {
