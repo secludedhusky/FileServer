@@ -18,9 +18,11 @@ app.use(ConnectBusboy());
 // Middleware
 const UploadFile = require("./routes/FileUpload");
 const GetFile = require("./routes/FileGet");
+const Utilities = require("./routes/Utilities");
 
 app.use(`${process.env.API_V1}`, new UploadFile().GetRoutes());
 app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
+app.use(`${process.env.API_V1}/utilities`, new Utilities().GetRoutes());
 app.use(express.static(process.env.PUBLIC_HTML));
 
 // Start App
@@ -32,5 +34,6 @@ app.use(express.static(process.env.PUBLIC_HTML));
         app.get("/", (req, res) => {
             res.send("Hello, world!");
         });
+
     });
 })();
