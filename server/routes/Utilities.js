@@ -30,6 +30,11 @@ class Utilities extends RouteBase {
             })
             .catch((error) => {
                 console.error(error);
+                res.set({ "Content-Type": "application/json" }).status(500)
+                    .send({
+                        status: 500,
+                        message: "No connection."
+                    });
             });
     }
     
@@ -44,6 +49,11 @@ class Utilities extends RouteBase {
             })
             .catch((error) => {
                 console.error(error);
+                res.set({ "Content-Type": "application/json" }).status(500)
+                    .send({
+                        status: 500,
+                        message: "No connection."
+                    });
             });
     }
 
