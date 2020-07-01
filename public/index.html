@@ -54,7 +54,8 @@
                 await fetch("/api/v1/utilities/version")
                     .then(async (r) => {
                         if (r.ok) {
-                            document.querySelector("#app-version").innerText = (await r.json()).message[0].version;
+                            let data = (await r.json()).message[0]
+                            document.querySelector("#app-version").innerText = `${data.branch} ${data.version.substr(0, 8)}`;
                         }
                     });
                 await fetch("/api/v1/utilities/stats")

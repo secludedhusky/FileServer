@@ -15,7 +15,7 @@ class Utilities extends RouteBase {
         res.set({ "Content-Type": "application/json" }).status(200)
             .send({
                 status: 200,
-                message: [{ version: gitInfo.sha }]
+                message: [{ version: gitInfo.sha, branch: gitInfo.branch }]
             });
     }
 
