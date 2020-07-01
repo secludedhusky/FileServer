@@ -4,7 +4,6 @@
     <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
     </head>
 
     <body>
@@ -47,11 +46,12 @@
             (async () => {
                 await fetch("/api/v1/utilities/version")
                     .then(async (r) => {
-                        if(r.ok) {
+                        if (r.ok) {
                             document.querySelector("#app-version").innerText = await r.text();
                         }
                     });
             })();
         </script>
     </body>
+
 </html>
