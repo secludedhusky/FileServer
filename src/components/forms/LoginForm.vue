@@ -11,11 +11,12 @@
                 </v-col>
             </v-row>
             <v-row>
-                <v-col class="text-right" cols="12" sm="12">
+                <v-col cols="12" sm="12">
                     <v-btn
                         :loading="loading"
                         :disabled="loading"
-                        color="info"
+                        color="secondary"
+                        block
                         @click="loader = 'loading'"
                     >
                         Login
@@ -67,17 +68,15 @@ export default {
                 .then(r => {
                     if (r.ok) {
                         // get token
-                        setTimeout(() => (this[l] = false), 1000);
                     } else {
                         console.error(`Login failed: ${r.statusText}`);
-                        setTimeout(() => (this[l] = false), 1000);
                     }
+                    setTimeout(() => (this.loading = false), 1000);
                 })
                 .catch(error => {
                     console.error(error);
+                    setTimeout(() => (this.loading = false), 1000);
                 });
-
-            this.loader = null;
         }
     }
 };
@@ -90,34 +89,34 @@ export default {
 }
 @-moz-keyframes loader {
     from {
-        transform: rotate(0);
+        transform: rotate(360deg);
     }
     to {
-        transform: rotate(360deg);
+        transform: rotate(0);
     }
 }
 @-webkit-keyframes loader {
     from {
-        transform: rotate(0);
+        transform: rotate(360deg);
     }
     to {
-        transform: rotate(360deg);
+        transform: rotate(0);
     }
 }
 @-o-keyframes loader {
     from {
-        transform: rotate(0);
+        transform: rotate(360deg);
     }
     to {
-        transform: rotate(360deg);
+        transform: rotate(0);
     }
 }
 @keyframes loader {
     from {
-        transform: rotate(0);
+        transform: rotate(360deg);
     }
     to {
-        transform: rotate(360deg);
+        transform: rotate(0);
     }
 }
 </style>

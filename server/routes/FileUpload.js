@@ -1,6 +1,6 @@
 const RouteBase = require("./RouteBase");
-const Database = require("../lib/database-manager");
-const database = new Database(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
+const DatabaseManager = require("../lib/database-manager");
+const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
 const path = require('path');
 const fs = require('fs-extra');

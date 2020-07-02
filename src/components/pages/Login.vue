@@ -6,17 +6,10 @@
 </template>
 
 <script>
-import LoginForm from '../forms/LoginForm.vue';
+import LoginForm from "../forms/LoginForm.vue";
 
 export default {
     name: "login",
-    methods: {
-        navigate(page) {
-            if (this.$router.history.current.name !== page) {
-                this.$router.push(page);
-            }
-        }
-    },
     components: {
         LoginForm
     }

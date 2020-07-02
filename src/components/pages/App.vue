@@ -16,10 +16,19 @@
 
                             <v-list-item link v-on:click="navigate('login')">
                                 <v-list-item-action>
-                                    <v-icon>mdi-account</v-icon>
+                                    <v-icon>mdi-login</v-icon>
                                 </v-list-item-action>
                                 <v-list-item-content>
                                     <v-list-item-title>Login</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+
+                            <v-list-item link v-on:click="navigate('register')">
+                                <v-list-item-action>
+                                    <v-icon>mdi-account</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Register</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
 
@@ -31,6 +40,7 @@
                                     <v-list-item-title>Status</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
+                            
                         </v-list>
                     </v-navigation-drawer>
 
