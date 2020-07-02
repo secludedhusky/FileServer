@@ -1,24 +1,18 @@
 <template>
     <v-container>
-        <h1>Login</h1>
-        <login-form></login-form>
+        <h1>Status</h1>
     </v-container>
 </template>
 
 <script>
-import LoginForm from '../forms/LoginForm.vue';
-
 export default {
-    name: "login",
+    name: "status",
     methods: {
         navigate(page) {
             if (this.$router.history.current.name !== page) {
                 this.$router.push(page);
             }
         }
-    },
-    components: {
-        LoginForm
     }
 };
-</script>
+</script> 

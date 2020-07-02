@@ -13,14 +13,14 @@ let app = new Vue({
     components: { App },
     vuetify,
     router,
-    template: "<App/>",  
+    template: "<App/>",
     props: {
-      source: String,
-    },  
+        source: String,
+    },
     data: () => ({
-      drawer: null,
+        drawer: null
     }),
-    created () {
-      this.$vuetify.theme.dark = true
+    created() {
+        this.$vuetify.theme.dark = true
     },
 }).$mount("#app");

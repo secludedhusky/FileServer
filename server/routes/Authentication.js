@@ -34,8 +34,9 @@ class Authentication extends RouteBase {
             var router = require("express").Router();
 
             router.post("/login", this.login);
-            router.get("/logout", this.logout);
             router.post("/register", this.register);
+            
+            router.get("/logout", this.logout);
 
             return router;
         })();

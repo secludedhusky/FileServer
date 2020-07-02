@@ -3,6 +3,7 @@ const express = require("express");
 const path = require("path");
 const BodyParser = require('body-parser');
 const ConnectBusboy = require('connect-busboy');
+const cors = require('cors');
 
 // DotEnv
 require('dotenv').config();
@@ -11,10 +12,11 @@ require('dotenv').config();
 const app = express();
 const router = express.Router();
 const port = process.env.PORT || 3030;
-app.use(BodyParser.urlencoded({ extended: true }));
-app.use(BodyParser.json());
 
+app.use(cors());
 app.use(ConnectBusboy());
+app.use(BodyParser.urlencoded({ extended: false }));
+app.use(BodyParser.json());
 
 // Middleware
 const UploadFile = require("./server/routes/FileUpload");

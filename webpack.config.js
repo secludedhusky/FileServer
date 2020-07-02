@@ -5,6 +5,8 @@ const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin');
 const path = require('path');
 const webpack = require('webpack');
 
+
+
 module.exports = {
     mode: "development",
     entry: './src/index.js',
@@ -26,6 +28,14 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: 'babel-loader'
+            },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader'
+            },
+            {
+                test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
+                loader: 'file-loader'
             },
             {
                 test: /\.html$/i,
@@ -54,12 +64,16 @@ module.exports = {
                                 indentedSyntax: true // optional
                             },
                         },
-                    }
+                    },
                 ],
-            }
-        ]
+            },
+        ],
     },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': "'development'",
+            'process.env.API_URI_V1': "'http://localhost:3030/api/v1'"
+        }),
         new HtmlWebpackPlugin({
             title: "index",
             template: "src/index.html"

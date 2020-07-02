@@ -13,12 +13,22 @@
                                     <v-list-item-title>Home</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
+
                             <v-list-item link v-on:click="navigate('login')">
                                 <v-list-item-action>
                                     <v-icon>mdi-account</v-icon>
                                 </v-list-item-action>
                                 <v-list-item-content>
                                     <v-list-item-title>Login</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+
+                            <v-list-item link v-on:click="navigate('status')">
+                                <v-list-item-action>
+                                    <v-icon>mdi-server</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Status</v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list>
