@@ -1,20 +1,53 @@
 <template>
-    <div id="app">
-        <md-toolbar class="md-accent" md-elevation="1">
-            <h3 class="md-title" style="flex: 1">Home</h3>
-            <md-button v-on:click="navigate('home')">Home</md-button>
-            <md-button v-on:click="navigate('login')">Login</md-button>
-        </md-toolbar>
+    <v-app>
+        <div id="app">
+            <v-app id="inspire">
+                <v-app id="inspire">
+                    <v-navigation-drawer v-model="drawer" app clipped>
+                        <v-list dense>
+                            <v-list-item link v-on:click="navigate('home')">
+                                <v-list-item-action>
+                                    <v-icon>mdi-home</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Home</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item link v-on:click="navigate('login')">
+                                <v-list-item-action>
+                                    <v-icon>mdi-account</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>Login</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-navigation-drawer>
 
-        <md-content>
-            <router-view></router-view>
-        </md-content>
-    </div>
+                    <v-app-bar app clipped-left>
+                        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+                        <v-toolbar-title>Upload Server</v-toolbar-title>
+                    </v-app-bar>
+
+                    <v-main>
+                        <router-view></router-view>
+                    </v-main>
+
+                    <v-footer app>
+                        <span>&copy; {{ new Date().getFullYear() }}</span>
+                    </v-footer>
+                </v-app>
+            </v-app>
+        </div>
+    </v-app>
 </template>
 
 <script>
 export default {
-    name: "home-page",
+    name: "landing-page",
+    data: () => ({
+        drawer: true
+    }),
     methods: {
         navigate(page) {
             if (this.$router.history.current.name !== page) {
@@ -24,9 +57,3 @@ export default {
     }
 };
 </script>
-
-<style>
-.md-content {
-    padding: 32px;
-}
-</style>

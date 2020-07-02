@@ -1,10 +1,12 @@
-// vue.config.js
+const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
+
 module.exports = {
-    configureWebpack: config => {
-        if (process.env.NODE_ENV === 'production') {
-            // mutate config for production...
-        } else {
-            // mutate for development...
-        }
-    }
+    "transpileDependencies": [
+        "vuetify"
+    ],
+    configureWebpack: {
+        plugins: [
+            new VuetifyLoaderPlugin()
+        ],
+    },
 }

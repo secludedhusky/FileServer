@@ -1,6 +1,6 @@
 // Imports
 import Vue from "vue";
-import * as VueMaterial from "vue-material"; // Lazy
+import vuetify from "./plugins/vuetify"
 
 // Components
 import App from "./components/pages/App.vue";
@@ -8,16 +8,19 @@ import App from "./components/pages/App.vue";
 // Router
 import router from './router.js';
 
-// Vue Uses
-Vue.use(VueMaterial.default);
-
-// CSS
-import 'vue-material/dist/vue-material.min.css'
-import 'vue-material/dist/theme/default.css'
-
 // Main Ap
 let app = new Vue({
     components: { App },
+    vuetify,
     router,
-    template: "<App/>"
+    template: "<App/>",  
+    props: {
+      source: String,
+    },  
+    data: () => ({
+      drawer: null,
+    }),
+    created () {
+      this.$vuetify.theme.dark = true
+    },
 }).$mount("#app");
