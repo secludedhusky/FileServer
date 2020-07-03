@@ -58,8 +58,6 @@ class DatabaseManager {
 
     async select(columns, table, where) {
         return new Promise(async (resolve, reject) => {
-            console.log(where);
-
             let tableParams = [table];
             let queryAppendix = "";
 

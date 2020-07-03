@@ -5,7 +5,7 @@ const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-
+require("dotenv").config({path: `${__dirname}/.env.client`});
 
 module.exports = {
     mode: "development",
@@ -71,8 +71,8 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': "'development'",
-            'process.env.API_URI_V1': "'http://localhost:3030/api/v1'"
+            'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+            'process.env.API_URI_V1': `'${process.env.API_URI_V1}'`
         }),
         new HtmlWebpackPlugin({
             title: "index",
