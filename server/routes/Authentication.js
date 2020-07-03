@@ -73,7 +73,14 @@ class Authentication extends RouteBase {
         ]);
 
         if (check.length > 0) {
-            let conflicts = Object.keys(check[0]);
+            let conflicts = [];
+            if(check[0].user_name === req.body.username) {
+                conflicts.push("user_name");
+            }
+            if(check[0].user_email === req.body.email) {
+                conflicts.push("user_email");
+            }
+
             res.status(409).send({
                 status: 409,
                 message: "An account with that username or email already exists.",
