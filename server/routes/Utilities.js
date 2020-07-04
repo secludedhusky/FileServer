@@ -37,7 +37,7 @@ class Utilities extends RouteBase {
                     });
             });
     }
-    
+
     async getViewCount(req, res) {
         database.select("COUNT(id) as views", process.env.VIEW_TABLE_V1)
             .then((r) => {

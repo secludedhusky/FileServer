@@ -5,7 +5,7 @@ const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-require("dotenv").config({path: `${__dirname}/.env.client`});
+require("dotenv").config({ path: `${__dirname}/.env.client` });
 
 module.exports = {
     mode: "development",

@@ -1,59 +1,70 @@
 <template>
     <v-form ref="form" v-model="valid" lazy-validation>
         <v-container>
-            <v-row>
+            <v-row v-if="accountCreated">
                 <v-col cols="12" sm="12">
-                    <v-text-field
-                        v-model="email"
-                        :rules="emailRules"
-                        :error-messages="emailError"
-                        label="Email"
-                        type="email"
-                        filled
-                        @change="resetValidation('email')"
-                    ></v-text-field>
+                    <v-alert type="success">
+                        Account has been created, you can now login!
+                        <br />Redirecting to login...
+                    </v-alert>
                 </v-col>
             </v-row>
-            <v-row>
-                <v-col cols="12" sm="6">
-                    <v-text-field
-                        v-model="username"
-                        :rules="usernameRules"
-                        :error-messages="usernameError"
-                        label="Username"
-                        type="text"
-                        filled
-                        @change="resetValidation('username')"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6">
-                    <v-text-field
-                        :rules="passwordRules"
-                        v-model="password"
-                        label="Password"
-                        type="password"
-                        filled
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="12" sm="12">
-                    <v-btn
-                        :loading="loading"
-                        :disabled="!valid || loading"
-                        color="secondary"
-                        block
-                        @click="loader = 'loading'; register()"
-                    >
-                        Regsiter
-                        <template v-slot:loader>
-                            <span class="custom-loader">
-                                <v-icon light>cached</v-icon>
-                            </span>
-                        </template>
-                    </v-btn>
-                </v-col>
-            </v-row>
+
+            <div v-if="!accountCreated">
+                <v-row>
+                    <v-col cols="12" sm="12">
+                        <v-text-field
+                            v-model="email"
+                            :rules="emailRules"
+                            :error-messages="emailError"
+                            label="Email"
+                            type="email"
+                            filled
+                            @change="resetValidation('email')"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" sm="6">
+                        <v-text-field
+                            v-model="username"
+                            :rules="usernameRules"
+                            :error-messages="usernameError"
+                            label="Username"
+                            type="text"
+                            filled
+                            @change="resetValidation('username')"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                        <v-text-field
+                            :rules="passwordRules"
+                            v-model="password"
+                            label="Password"
+                            type="password"
+                            filled
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" sm="12">
+                        <v-btn
+                            :loading="loading"
+                            :disabled="!valid || loading"
+                            color="secondary"
+                            block
+                            @click="loader = 'loading'; register()"
+                        >
+                            Regsiter
+                            <template v-slot:loader>
+                                <span class="custom-loader">
+                                    <v-icon light>cached</v-icon>
+                                </span>
+                            </template>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </div>
         </v-container>
     </v-form>
 </template>
@@ -87,7 +98,9 @@ export default {
             loader: null,
             loading: false,
 
-            lazy: false
+            lazy: false,
+
+            accountCreated: false
         };
     },
     watch: {
@@ -125,7 +138,8 @@ export default {
             response
                 .then(r => {
                     if (r.ok) {
-                        // get token
+                        this.accountCreated = true;
+                        setTimeout(() => this.$router.push("login"), 2000);
                     } else {
                         console.error(`Login failed: ${r.statusText}`);
                         r.json().then(data => {
@@ -193,5 +207,17 @@ export default {
     to {
         transform: rotate(0);
     }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition-duration: 0.3s;
+    transition-property: opacity;
+    transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+    opacity: 0;
 }
 </style>
