@@ -5,6 +5,7 @@ import Home from "./components/pages/Home.vue";
 import Login from "./components/pages/Login.vue";
 import Register from "./components/pages/Register.vue";
 import Status from "./components/pages/Status.vue";
+import Dashboard from "./components/pages/Dashboard.vue";
 
 Vue.use(VueRouter);
 
@@ -34,6 +35,11 @@ export default new VueRouter({
             path: '/status',
             name: 'status',
             component: Status
+        },
+        {
+            path: '/dashboard',
+            name: 'dashboard',
+            component: Dashboard
         }
     ]
 });

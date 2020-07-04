@@ -25,6 +25,8 @@ Create these file locally, don't commit them!
 * `API_V1`=`/api/v1`
 * `NODE_ENV`=`development` or `production`
 
+* `SESSION_SECRET`= `Enter a value here`
+
 # .env.client
 ## Client Configuration
 IMPORTANT: Do not store secrets in this file as they exposed to the client side.

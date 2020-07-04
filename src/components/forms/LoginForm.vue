@@ -17,7 +17,7 @@
                         :disabled="loading"
                         color="secondary"
                         block
-                        @click="loader = 'loading'"
+                        @click="loader = 'loading'; login();"
                     >
                         Login
                         <template v-slot:loader>
@@ -45,7 +45,10 @@ export default {
     },
     watch: {
         loader() {
-            this.login();
+            let l = this.loader;
+            this[l] = !this[l];
+
+            this.loader = null;
         }
     },
     methods: {
@@ -67,7 +70,20 @@ export default {
             response
                 .then(r => {
                     if (r.ok) {
-                        // get token
+                        r.json()
+                            .then((json) => {
+                                console.log(json);
+                                this.$store.state.user.loggedIn = true;
+                                this.$store.state.user.id = json.data.id;
+                                this.$store.state.user.username = json.data.username;
+                                this.$store.state.user.email = json.data.email;
+                                this.$router.push("dashboard");
+
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                            })
+
                     } else {
                         console.error(`Login failed: ${r.statusText}`);
                     }

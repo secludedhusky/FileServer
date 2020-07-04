@@ -2,14 +2,19 @@
 import Vue from "vue";
 import vuetify from "./plugins/vuetify"
 
+
 // Components
 import App from "./components/pages/App.vue";
 
 // Router
 import router from './router.js';
 
+// Store
+import store from "./store";
+
 // Main Ap
 let app = new Vue({
+    store: store,
     components: { App },
     vuetify,
     router,
@@ -17,9 +22,6 @@ let app = new Vue({
     props: {
         source: String,
     },
-    data: () => ({
-        drawer: null
-    }),
     created() {
         this.$vuetify.theme.dark = true
     },

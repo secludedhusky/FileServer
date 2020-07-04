@@ -3,45 +3,25 @@
         <div id="app">
             <v-app id="inspire">
                 <v-app id="inspire">
-                    <v-navigation-drawer v-model="drawer" app clipped>
-                        <v-list dense>
-                            <v-list-item link v-on:click="navigate('home')">
-                                <v-list-item-action>
-                                    <v-icon>mdi-home</v-icon>
-                                </v-list-item-action>
-                                <v-list-item-content>
-                                    <v-list-item-title>Home</v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-
-                            <v-list-item link v-on:click="navigate('login')">
-                                <v-list-item-action>
-                                    <v-icon>mdi-login</v-icon>
-                                </v-list-item-action>
-                                <v-list-item-content>
-                                    <v-list-item-title>Login</v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-
-                            <v-list-item link v-on:click="navigate('register')">
-                                <v-list-item-action>
-                                    <v-icon>mdi-account</v-icon>
-                                </v-list-item-action>
-                                <v-list-item-content>
-                                    <v-list-item-title>Register</v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-
-                            <v-list-item link v-on:click="navigate('status')">
-                                <v-list-item-action>
-                                    <v-icon>mdi-server</v-icon>
-                                </v-list-item-action>
-                                <v-list-item-content>
-                                    <v-list-item-title>Status</v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </v-list>
-                    </v-navigation-drawer>
+                    <transition name="fade" mode="out-in">
+                        <v-navigation-drawer v-model="drawer" app clipped>
+                            <v-list dense>
+                                <v-list-item
+                                    link
+                                    v-for="(item, index) in links"
+                                    :key="index"
+                                    :to="item.path"
+                                >
+                                    <v-list-item-action>
+                                        <v-icon>{{ item.icon }}</v-icon>
+                                    </v-list-item-action>
+                                    <v-list-item-content>
+                                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-navigation-drawer>
+                    </transition>
 
                     <v-app-bar app clipped-left>
                         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
@@ -49,16 +29,13 @@
                     </v-app-bar>
 
                     <v-main>
-                        <transition
-                            name="fade"
-                            mode="out-in"
-                        >
+                        <transition name="fade" mode="out-in">
                             <router-view></router-view>
                         </transition>
                     </v-main>
 
                     <v-footer app>
-                        <span>&copy; {{ new Date().getFullYear() }}</span>
+                        <span>&copy; {{ new Date().getFullYear() }} : {{ this.$store.getters.loggedIn }}</span>
                     </v-footer>
                 </v-app>
             </v-app>
@@ -68,9 +45,44 @@
 
 <script>
 export default {
-    name: "landing-page",
+    name: "app-main",
+
+    computed: {
+        links() {
+            return this.items.filter(item => {
+                return item.authRequired === this.$store.getters.loggedIn;
+            });
+        }
+    },
     data: () => ({
-        drawer: true
+        drawer: true,
+        loggedIn: false,
+        items: [
+            {
+                path: "/dashboard",
+                title: "Dashboard",
+                icon: "mdi-view-dashboard",
+                authRequired: true
+            },
+            {
+                path: "/status",
+                title: "Status",
+                icon: "mdi-server",
+                authRequired: true
+            },
+            {
+                path: "/login",
+                title: "Login",
+                icon: "mdi-login",
+                authRequired: false
+            },
+            {
+                path: "/register",
+                title: "Register",
+                icon: "mdi-account",
+                authRequired: false
+            }
+        ]
     }),
     methods: {
         navigate(page) {
@@ -78,6 +90,9 @@ export default {
                 this.$router.push(page);
             }
         }
+    },
+    mounted() {
+        console.log(this.$store.getters.loggedIn);
     }
 };
 </script>

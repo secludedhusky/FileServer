@@ -13,6 +13,11 @@ export default {
                 this.$router.push(page);
             }
         }
-    }
+    },
+    created: function () {
+        if(!this.$store.state.user.loggedIn) {
+            this.$router.push("login");
+        }
+    } 
 };
 </script> 
