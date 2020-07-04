@@ -13,35 +13,35 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const { request } = require("express");
 
-// passport.use(new LocalStrategy(
-//     async (username, password, done) => {
-//         let password = 
-//         await database.select("id, user_name, user_permissions")
-//             .then((data) => {
-//                 if(data.length > 0 && data.user_name === username) {
+passport.use(new LocalStrategy(
+    async (username, password, done) => {
+        let password = bcrypt.
+        await database.select("id, user_name, user_email")
+            .then((data) => {
+                if (data.length > 0 && data.user_name === username) {
 
-//                 }
-//             })
-//             .catch((error) => {
-//                 done(error, false, {
-//                     status: 500,
-//                     message: "Unable to connect to database."
-//                 });
-//             });
+                }
+            })
+            .catch((error) => {
+                done(error, false, {
+                    status: 500,
+                    message: "Unable to connect to database."
+                });
+            });
 
 
-//         database.select({ username: username }, function (err, user) {
-//             if (err) { return done(err); }
-//             if (!user) {
-//                 return done(null, false, { message: 'Incorrect username.' });
-//             }
-//             if (!user.validPassword(password)) {
-//                 return done(null, false, { message: 'Incorrect password.' });
-//             }
-//             return done(null, user);
-//         });
-//     }
-// ));
+        database.select({ username: username }, function (err, user) {
+            if (err) { return done(err); }
+            if (!user) {
+                return done(null, false, { message: 'Incorrect username.' });
+            }
+            if (!user.validPassword(password)) {
+                return done(null, false, { message: 'Incorrect password.' });
+            }
+            return done(null, user);
+        });
+    }
+));
 
 
 class Authentication extends RouteBase {
@@ -74,7 +74,7 @@ class Authentication extends RouteBase {
         ]);
 
         let conflicts = [];
-        if(check.length > 0) {
+        if (check.length > 0) {
             if (check[0].hasOwnProperty("user_name") && check[0].user_name === request.username) {
                 conflicts.push("user_name");
             }
@@ -126,44 +126,44 @@ class Authentication extends RouteBase {
             return;
         }
 
-        bcrypt.hash(req.body.password, 10, (error, hash) => {
-            if (error) {
+        bcrypt.hash(req.body.password, 10)
+            .then((hash) => {
+                database.insert(process.env.USER_TABLE_V1, {
+                    user_name: req.body.username,
+                    user_pass: hash,
+                    user_email: req.body.email,
+                    user_permission: JSON.stringify({}),
+                    user_creation: new Date().toISOString().slice(0, 19).replace('T', ' ')
+                })
+                    .then((r) => {
+                        if (r.affectedRows === 1) {
+                            res.status(201).send({
+                                status: 201,
+                                message: "Account created"
+                            })
+                        } else {
+                            res.status(409).send({
+                                status: 409,
+                                message: JSON.stringify(r)
+                            })
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).send({
+                            status: 500,
+                            message: "Internal server error"
+                        });
+                    });
+            })
+            .catch((error) => {
                 console.error(error);
                 res.status(500).send({
                     status: 500,
                     message: "Internal server error"
                 });
                 return;
-            }
-
-            database.insert(process.env.USER_TABLE_V1, {
-                user_name: req.body.username,
-                user_pass: hash,
-                user_email: req.body.email,
-                user_permission: JSON.stringify({}),
-                user_creation: new Date().toISOString().slice(0, 19).replace('T', ' ')
             })
-                .then((r) => {
-                    if (r.affectedRows === 1) {
-                        res.status(201).send({
-                            status: 201,
-                            message: "Account created"
-                        })
-                    } else {
-                        res.status(409).send({
-                            status: 409,
-                            message: JSON.stringify(r)
-                        })
-                    }
-                })
-                .catch((error) => {
-                    console.error(error);
-                    res.status(500).send({
-                        status: 500,
-                        message: "Internal server error"
-                    });
-                });
-        });
     }
 
     GetRoutes() {
