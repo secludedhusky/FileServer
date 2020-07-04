@@ -87,33 +87,43 @@ class Authentication extends RouteBase {
                 conflicts: conflicts
             });
         } else {
-            database.insert(process.env.USER_TABLE_V1, {
-                user_name: req.body.username,
-                user_pass: req.body.password,
-                user_email: req.body.email,
-                user_permission: JSON.stringify({}),
-                user_creation: new Date().toISOString().slice(0, 19).replace('T', ' ')
-            })
-                .then((r) => {
-                    if (r.affectedRows === 1) {
-                        res.status(201).send({
-                            status: 201,
-                            message: "Account created"
-                        })
-                    } else {
-                        res.status(409).send({
-                            status: 409,
-                            message: JSON.stringify(r)
-                        })
-                    }
-                })
-                .catch((error) => {
+            bcrypt.hash(req.body.password, 10, (error, hash) => {
+                if (error) {
                     console.error(error);
                     res.status(500).send({
                         status: status,
                         message: "Internal server error"
                     });
-                });
+                } else {
+                    database.insert(process.env.USER_TABLE_V1, {
+                        user_name: req.body.username,
+                        user_pass: hash,
+                        user_email: req.body.email,
+                        user_permission: JSON.stringify({}),
+                        user_creation: new Date().toISOString().slice(0, 19).replace('T', ' ')
+                    })
+                        .then((r) => {
+                            if (r.affectedRows === 1) {
+                                res.status(201).send({
+                                    status: 201,
+                                    message: "Account created"
+                                })
+                            } else {
+                                res.status(409).send({
+                                    status: 409,
+                                    message: JSON.stringify(r)
+                                })
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            res.status(500).send({
+                                status: status,
+                                message: "Internal server error"
+                            });
+                        });
+                }
+            });
         }
     }
 
