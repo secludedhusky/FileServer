@@ -3,10 +3,7 @@
         <v-container>
             <v-row v-if="accountCreated">
                 <v-col cols="12" sm="12">
-                    <v-alert type="success">
-                        Account has been created, you can now login!
-                        <br />Redirecting to login...
-                    </v-alert>
+                    <v-alert type="success">Account has been created! Redirecting to login...</v-alert>
                 </v-col>
             </v-row>
 
@@ -89,7 +86,10 @@ export default {
                 v => !!v || "Username is required",
                 v =>
                     (v && v.length <= 50) ||
-                    "Username cannot be more than 50 characters"
+                    "Username cannot be more than 50 characters",
+                v =>
+                    /^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$/.test(v) ||
+                    "Username should only contain letters, number, and underscores"
             ],
 
             password: null,
@@ -142,12 +142,13 @@ export default {
                         setTimeout(() => this.$router.push("login"), 2000);
                     } else {
                         console.error(`Login failed: ${r.statusText}`);
-                        r.json().then(data => {
-                            data.conflicts.forEach(conflict => {
+                        r.json().then(response => {
+                            console.log(response);
+                            response.data.forEach(conflict => {
                                 switch (conflict) {
                                     case "user_name":
                                         this.usernameError =
-                                            "Username is taken";
+                                            "Username is already in use";
                                         break;
                                     case "user_email":
                                         this.emailError =
