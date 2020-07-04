@@ -5,48 +5,23 @@ const RouteBase = require("./RouteBase");
 const DatabaseManager = require("../lib/database-manager");
 const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
+// User
+const User = require("../types/User");
+
 // Passport
 const passport = require("passport");
 const LocalStrategy = require('passport-local').Strategy;
 
 // BCrypt
 const bcrypt = require('bcrypt');
-const { request } = require("express");
-
-passport.use(new LocalStrategy(
-    async (username, password, done) => {
-        let password = bcrypt.
-        await database.select("id, user_name, user_email")
-            .then((data) => {
-                if (data.length > 0 && data.user_name === username) {
-
-                }
-            })
-            .catch((error) => {
-                done(error, false, {
-                    status: 500,
-                    message: "Unable to connect to database."
-                });
-            });
-
-
-        database.select({ username: username }, function (err, user) {
-            if (err) { return done(err); }
-            if (!user) {
-                return done(null, false, { message: 'Incorrect username.' });
-            }
-            if (!user.validPassword(password)) {
-                return done(null, false, { message: 'Incorrect password.' });
-            }
-            return done(null, user);
-        });
-    }
-));
-
 
 class Authentication extends RouteBase {
     constructor() {
         super();
+
+        passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async (u, p, d) => { await this.loginStrategy(u, p, d) }));
+        passport.serializeUser(function (user, done) { done(null, user); });
+        passport.deserializeUser(function (user, done) { done(null, user); });
     }
 
     validateInputs(request) {
@@ -89,12 +64,46 @@ class Authentication extends RouteBase {
         };
     }
 
-    async login(req, res) {
-        res.set({ "Content-Type": "application/json" }).status(401)
-            .send({
-                status: 401,
-                message: `Unauthorized`
+    async loginStrategy(username, password, done) {
+        let data = await database.select("id, user_name, user_email, user_pass", process.env.USER_TABLE_V1, { user_name: username })
+            .catch((error) => {
+                done(error);
             });
+
+        if (data.length > 0 && data[0].user_name === username) {
+            let match = bcrypt.compare(password, data[0].user_pass);
+
+            if (match) {
+                done(null, {
+                    id: data[0].id,
+                    username: data[0].user_name,
+                    email: data[0].user_email
+                });
+            } else {
+                done(null, false, { message: "Invalid password" });
+            }
+        } else {
+            done(null, false, { message: "Invalid credentials" });
+        }
+    }
+
+    async login(req, res) {
+        if (req.user) {
+            res.status(202).send({
+                status: 202,
+                message: "Login successful",
+                data: {
+                    id: req.user.id,
+                    username: req.user.username,
+                    email: req.user.email
+                }
+            })
+        } else {
+            res.status(401).send({
+                status: 401,
+                message: "Invalid credentials"
+            })
+        }
     }
 
     async logout(req, res) {
@@ -110,7 +119,7 @@ class Authentication extends RouteBase {
         if (!inputCheck.valid) {
             res.status(422).send({
                 status: 422,
-                message: "Invalid data provided.",
+                message: "Invalid data provided",
                 data: inputCheck.data
             });
             return;
@@ -120,7 +129,7 @@ class Authentication extends RouteBase {
         if (!duplicateCheck.valid) {
             res.status(409).send({
                 status: 409,
-                message: "An account with that username or email already exists.",
+                message: "An account with that username or email already exists",
                 data: duplicateCheck.data
             });
             return;
@@ -170,7 +179,7 @@ class Authentication extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
-            router.post("/login", (req, res) => { this.login(req, res); });
+            router.post("/login", passport.authenticate('local'), this.login);
             router.post("/register", (req, res) => { this.register(req, res); });
             router.get("/logout", (req, res) => { this.logout(req, res); });
 
