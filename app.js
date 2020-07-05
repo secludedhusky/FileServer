@@ -1,39 +1,57 @@
 // Modules
+const path = require("path");
+const bodyParser = require('body-parser');
+const busboy = require('connect-busboy');
 const express = require("express");
-const BodyParser = require('body-parser');
-const ConnectBusboy = require('connect-busboy');
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const passport = require("passport");
+const cors = require('cors');
 
 // DotEnv
 require('dotenv').config();
+
+// Middleware
+const File = require("./server/routes/File");
+const Server = require("./server/routes/Server");
+const Authentication = require("./server/routes/Authentication");
+const User = require("./server/routes/User");
 
 // App Initialisation
 const app = express();
 const router = express.Router();
 const port = process.env.PORT || 3030;
-app.use(BodyParser.urlencoded({ extended: true }));
-app.use(BodyParser.json());
 
-app.use(ConnectBusboy());
+// Static
+app.use(express.static(path.join(__dirname, "dist")));
 
-// Middleware
-const UploadFile = require("./routes/FileUpload");
-const GetFile = require("./routes/FileGet");
-const Utilities = require("./routes/Utilities");
+// Modules
+app.use(cors());
+app.use(busboy());
 
-app.use(`${process.env.API_V1}`, new UploadFile().GetRoutes());
-app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
-app.use(`${process.env.API_V1}/utilities`, new Utilities().GetRoutes());
-app.use(express.static(process.env.PUBLIC_HTML));
+// Auth/Sessions
+app.use(cookieParser());
+app.use(session({ secret: process.env.SESSION_SECRET }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Body Parser
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// Custom Routes
+app.use(`${process.env.API_V1}`, new File().GetRoutes());
+app.use(`${process.env.API_V1}/server`, new Server().GetRoutes());
+app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());
+app.use(`${process.env.API_V1}/user`, new User().GetRoutes());
 
 // Start App
 (async function () {
     app.use(router);
     app.listen(port, function () {
         console.log(`Server is listening for connection.`);
-
         app.get("/", (req, res) => {
             res.send("Hello, world!");
         });
-
     });
 })();
