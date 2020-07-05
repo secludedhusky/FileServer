@@ -25,24 +25,22 @@ class Server extends RouteBase {
             });
 
         if (errors.length === 0) {
-            res.set({ "Content-Type": "application/json" }).status(200)
-                .send({
-                    status: 200,
-                    data: {
-                        ...fileCount,
-                        ...viewCount,
-                        version: gitInfo.sha,
-                        branch: gitInfo.branch
-                    }
-                });
+            res.status(200).send({
+                status: 200,
+                data: {
+                    ...fileCount,
+                    ...viewCount,
+                    version: gitInfo.sha,
+                    branch: gitInfo.branch
+                }
+            });
         } else {
-            res.set({ "Content-Type": "application/json" }).status(500)
-                .send({
-                    status: 500,
-                    message: {
-                        errors: errors
-                    }
-                });
+            res.status(500).send({
+                status: 500,
+                message: {
+                    errors: errors
+                }
+            });
         }
     }
 

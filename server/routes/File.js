@@ -69,7 +69,7 @@ class FileGet extends RouteBase {
                                 upload_mime: fileMime
                             })
                                 .then((r) => {
-                                    res.set({ "Content-Type": "application/json" }).status(200)
+                                    res.status(200)
                                         .send({
                                             status: 200,
                                             data: {
@@ -143,18 +143,16 @@ class FileGet extends RouteBase {
                 })
                 .catch((error) => {
                     console.error(error);
-                    res.status(500)
-                        .send({
-                            status: 500,
-                            message: error.message
-                        });
+                    res.status(500).send({
+                        status: 500,
+                        message: error.message
+                    });
                 });
         } else {
-            res.set({ "Content-Type": "application/json" }).status(404)
-                .send({
-                    status: 404,
-                    message: `No file found with id: ${fileId}`
-                });
+            res.status(404).send({
+                status: 404,
+                message: `No file found with id: ${fileId}`
+            });
         }
 
         // Log the interaction after the request

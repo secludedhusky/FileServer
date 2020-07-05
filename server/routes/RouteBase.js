@@ -57,11 +57,10 @@ class RouteBase {
     }
 
     notImplemented(req, res) {
-        res.set({ "Content-Type": "application/json" }).status(501)
-            .send({
-                status: 501,
-                message: `Not implemented.`
-            });
+        res.status(501).send({
+            status: 501,
+            message: `Not implemented.`
+        });
     }
 
     GetRoutes() {

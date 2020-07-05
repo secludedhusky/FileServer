@@ -14,9 +14,7 @@ class User extends RouteBase {
         res.status(200).send({
             status: 200,
             data: {
-                files: [
-                    { name: "test" }
-                ]
+                files: [{ name: "test" }]
             }
         })
     }
