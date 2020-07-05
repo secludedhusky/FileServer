@@ -9,7 +9,7 @@ const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, p
 const bcrypt = require('bcrypt');
 
 // UUID
-const { v4 : uuid } = require("uuid");
+const { v4: uuid } = require("uuid");
 
 class Authentication extends RouteBase {
     constructor() {

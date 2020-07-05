@@ -22,14 +22,16 @@ class FileGet extends RouteBase {
      */
     async uploadFile(req, res) {
         if (req.headers.hasOwnProperty("authorization") && RegEx.exec(req.headers.authorization)) {
-            let token = await database.select("token_revoked", process.env.TOKEN_TABLE_V1, { token_value: req.headers.authorization }, true)
+            let incomingToken = req.headers.authorization;
+
+            let token = await database.select("token_revoked", process.env.TOKEN_TABLE_V1, { token_value: incomingToken }, true)
                 .catch((error) => {
                     console.log(error);
                     res.status(500).send({
                         status: 500,
                         message: "Internal server error"
                     });
-                })
+                });
 
             if (token && !token.token_revoked) {
                 req.pipe(req.busboy);
@@ -83,6 +85,11 @@ class FileGet extends RouteBase {
                                             message: error.message
                                         });
                                 });
+
+                            database.increment(process.env.TOKEN_TABLE_V1, "token_usage", { token_value: incomingToken })
+                                .catch((error) => {
+                                    console.error(error);
+                                })
                         });
                     } catch (error) {
                         console.log(error);
@@ -113,30 +120,6 @@ class FileGet extends RouteBase {
 
     async getFile(req, res) {
         let fileId = req.params.uuid;
-
-        database.insert(process.env.VIEW_TABLE_V1, {
-            view_data: JSON.stringify({
-                method: req.method,
-                originalUrl: req.originalUrl,
-                baseUrl: req.baseUrl,
-                headers: req.headers,
-                rawHeaders: req.rawHeaders,
-                httpVersion: req.httpVersion,
-                hostname: req.hostname,
-                params: req.params,
-                ip: req.ip,
-                ips: req.ips,
-                body: req.body,
-                fresh: req.fresh,
-                destroyed: req.destroyed,
-                complete: req.complete,
-                secure: req.secure,
-                xhr: req.xhr
-            }),
-            view_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-            view_id: fileId
-        })
-            .catch((error) => { console.error(error); });
 
         if (RegEx.exec(fileId)) {
             database.select("*", process.env.UPLOAD_TABLE_V1, { id: fileId })
@@ -173,6 +156,31 @@ class FileGet extends RouteBase {
                     message: `No file found with id: ${fileId}`
                 });
         }
+
+        // Log the interaction after the request
+        database.insert(process.env.VIEW_TABLE_V1, {
+            view_data: JSON.stringify({
+                method: req.method,
+                originalUrl: req.originalUrl,
+                baseUrl: req.baseUrl,
+                headers: req.headers,
+                rawHeaders: req.rawHeaders,
+                httpVersion: req.httpVersion,
+                hostname: req.hostname,
+                params: req.params,
+                ip: req.ip,
+                ips: req.ips,
+                body: req.body,
+                fresh: req.fresh,
+                destroyed: req.destroyed,
+                complete: req.complete,
+                secure: req.secure,
+                xhr: req.xhr
+            }),
+            view_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            view_id: fileId
+        })
+            .catch((error) => { console.error(error); });
     }
 
 

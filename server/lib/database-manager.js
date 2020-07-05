@@ -105,10 +105,10 @@ class DatabaseManager {
 
                     connection.release();
 
-                    if (results) {
+                    if (results && results.length > 0) {
                         resolve(returnFirst ? results[0] : results);
                     } else {
-                        reject("Could not find a token.");
+                        resolve(results);
                     }
                 });
             }
@@ -144,6 +144,32 @@ class DatabaseManager {
 
             if (connection) {
                 connection.query(`UPDATE ?? SET ? ${queryAppendix}`, tableparams, (error, results, fields) => {
+                    if (error) {
+                        reject(error);
+                    }
+
+                    connection.release();
+                    resolve(results);
+                });
+            }
+        });
+    }
+
+    /**
+     * Increments a column in a table
+     * @param {string} table | Table to update
+     * @param {string} column| Column to change
+     * @param {object} where | Conditions for the selection
+     */
+    async increment(table, column, where) {
+        return new Promise(async (resolve, reject) => {
+            let connection = await this.getConnection()
+                .catch((error) => {
+                    reject(error);
+                });
+
+            if (connection) {
+                connection.query(`UPDATE ?? SET ${column} = ${column}+1`, [table], (error, results, fields) => {
                     if (error) {
                         reject(error);
                     }
