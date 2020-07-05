@@ -43,6 +43,11 @@ export default {
             loading: false
         };
     },
+    create() {
+        if (this.$store.getters.loggedIn) {
+            this.$router.push("dashboard");
+        }
+    },
     watch: {
         loader() {
             let l = this.loader;
@@ -59,7 +64,7 @@ export default {
             let response = fetch(`${process.env.API_URI_V1}/auth/login`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     username: this.username,

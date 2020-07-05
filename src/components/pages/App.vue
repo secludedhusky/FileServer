@@ -35,7 +35,7 @@
                     </v-main>
 
                     <v-footer app>
-                        <span>{{ copy }} &copy; {{ new Date().getFullYear() }} | {{ this.$store.getters.appVersion }}</span>
+                        <span>{{ copy }} &copy; {{ new Date().getFullYear() }}</span>
                     </v-footer>
                 </v-app>
             </v-app>
@@ -95,7 +95,7 @@ export default {
         }
     },
     created() {
-        this.$store.dispatch("getVersion", { self: this});
+        this.$store.dispatch("checkAuth");
     },
     mounted() {
         console.log(this.$store.getters.loggedIn);

@@ -26,7 +26,7 @@ import FileList from "../lists/FileList.vue";
 export default {
     name: "dashboard",
     components: { FileList },
-    created: function() {
+    created() {
         if (!this.$store.state.user.loggedIn) {
             this.$router.push("login");
         }

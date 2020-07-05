@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const busboy = require('connect-busboy');
 const express = require("express");
 const session = require("express-session");
+const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const cors = require('cors');
 
@@ -29,14 +30,15 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.use(cors());
 app.use(busboy());
 
-// Body Parser
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
 // Auth/Sessions
+app.use(cookieParser());
 app.use(session({ secret: process.env.SESSION_SECRET }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Body Parser
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Custom Routes
 app.use(`${process.env.API_V1}`, new UploadFile().GetRoutes());

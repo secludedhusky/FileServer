@@ -5,26 +5,15 @@ const RouteBase = require("./RouteBase");
 const DatabaseManager = require("../lib/database-manager");
 const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
-// User
-const User = require("../types/User");
-
-// Passport
-const passport = require("passport");
-const LocalStrategy = require('passport-local').Strategy;
-
 // BCrypt
 const bcrypt = require('bcrypt');
 
 class Authentication extends RouteBase {
     constructor() {
         super();
-
-        passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async (u, p, d) => { await this.loginStrategy(u, p, d) }));
-        passport.serializeUser(function (user, done) { done(null, user); });
-        passport.deserializeUser(function (user, done) { done(null, user); });
     }
 
-    validateInputs(request) {
+    async validateInputs(request) {
         let validateEmail = /.+@.+\..+/.test(request.email);
         let validateUsername = /^[a-zA-Z0-9]+([_ -]?[a-zA-Z0-9])*$/.test(request.username);
 
@@ -64,40 +53,40 @@ class Authentication extends RouteBase {
         };
     }
 
-    async loginStrategy(username, password, done) {
-        let data = await database.select("id, user_name, user_email, user_pass", process.env.USER_TABLE_V1, { user_name: username })
-            .catch((error) => {
-                done(error);
-            });
-
-        if (data.length > 0 && data[0].user_name === username) {
-            let match = bcrypt.compare(password, data[0].user_pass);
-
-            if (match) {
-                done(null, {
-                    id: data[0].id,
-                    username: data[0].user_name,
-                    email: data[0].user_email
-                });
-            } else {
-                done(null, false, { message: "Invalid password" });
-            }
-        } else {
-            done(null, false, { message: "Invalid credentials" });
-        }
+    async check (req, res) {
+        res.status(200).send({
+            status: 200,
+            message: "Success",
+            data: req.user
+        });
     }
 
     async login(req, res) {
         if (req.user) {
-            res.status(202).send({
-                status: 202,
-                message: "Login successful",
-                data: {
-                    id: req.user.id,
-                    username: req.user.username,
-                    email: req.user.email
+            let user = {
+                id: req.user.id,
+                username: req.user.username,
+                email: req.user.email
+            };
+
+            req.login(user, (error) => {
+                if (error) {
+                    res.status(500).send({
+                        status: 500,
+                        message: "Internal server error"
+                    });
+                } else {
+                    res.status(202).send({
+                        status: 202,
+                        message: "Login successful",
+                        data: {
+                            id: req.user.id,
+                            username: req.user.username,
+                            email: req.user.email
+                        }
+                    })
                 }
-            })
+            });
         } else {
             res.status(401).send({
                 status: 401,
@@ -115,7 +104,7 @@ class Authentication extends RouteBase {
     }
 
     async register(req, res) {
-        let inputCheck = this.validateInputs(req.body);
+        let inputCheck = await this.validateInputs(req.body);
         if (!inputCheck.valid) {
             res.status(422).send({
                 status: 422,
@@ -179,7 +168,9 @@ class Authentication extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
-            router.post("/login", passport.authenticate('local'), this.login);
+            router.get("/check", this.isAuthenticated, this.check);
+            router.post("/login", this.passport.authenticate('local'), this.login);
+
             router.post("/register", (req, res) => { this.register(req, res); });
             router.get("/logout", (req, res) => { this.logout(req, res); });
 

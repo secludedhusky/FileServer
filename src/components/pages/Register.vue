@@ -12,6 +12,11 @@ export default {
     name: "register",
     components: {
         RegistrationForm
+    },
+    created() {
+        if (this.$store.state.user.loggedIn) {
+            this.$router.push("dashnoard");
+        }
     }
 };
 </script>

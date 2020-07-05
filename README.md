@@ -13,7 +13,7 @@ Simple file server for ShareX with web interface
 Create these file locally, don't commit them!
 
 # .env
-## Server Configuration
+### Server Configuration
 * `APP_PORT`=`3030`
 
 * `DB_HOST`=`localhost`
@@ -31,7 +31,7 @@ Create these file locally, don't commit them!
 * `SESSION_SECRET`= `Enter a value here`
 
 # .env.client
-## Client Configuration
+### Client Configuration
 IMPORTANT: Do not store secrets in this file as they exposed to the client side.
 * `NODE_ENV`=`development` or `production`
-* `API_URI_V1`=`http://localhost:3030/api/v1` (Your API URL)
+* `API_URI_V1`=`/api/v1`

@@ -61,9 +61,9 @@ class Utilities extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
-            router.get("/version", this.getVersion);
-            router.get("/uploads", this.getFileCount);
-            router.get("/views", this.getViewCount);
+            router.get("/version", this.isAuthenticated, this.getVersion);
+            router.get("/uploads", this.isAuthenticated, this.getFileCount);
+            router.get("/views", this.isAuthenticated, this.getViewCount);
 
             return router;
         })();

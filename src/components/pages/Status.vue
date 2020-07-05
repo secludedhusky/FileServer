@@ -1,6 +1,9 @@
 <template>
     <v-container>
         <h1>Status</h1>
+        <p>
+            App Version: {{ this.$store.getters.appVersion }}
+        </p>
     </v-container>
 </template>
 
@@ -14,10 +17,12 @@ export default {
             }
         }
     },
-    created: function () {
-        if(!this.$store.getters.loggedIn) {
+    created: function() {
+        if (!this.$store.getters.loggedIn) {
             this.$router.push("login");
         }
-    } 
+        
+        this.$store.dispatch("getVersion", { self: this });
+    }
 };
 </script> 

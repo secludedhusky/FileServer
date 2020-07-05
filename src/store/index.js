@@ -33,9 +33,20 @@ export default new Vuex.Store({
         },
     },
     mutations: {
+        FETCH_AUTH(state, data) {
+            state.user = {
+                loggedIn: true,
+                id: data.id,
+                username: data.username,
+                email: data.email,
+                files: []
+            }
+        },
         FETCH_VERSION(state, data) {
-            state.app.version = data.version;
-            state.app.branch = data.branch;
+            state.app = {
+                version: data.version,
+                branch: data.branch
+            }
         },
         FETCH_UPLOADS(state, data) {
             state.app.uploads = data.version;
@@ -44,13 +55,30 @@ export default new Vuex.Store({
             state.app.version = data.version;
         },
         FETCH_FILES(state, data) {
-            console.log("Commit files", data);
             state.user.files = data;
         }
     },
     actions: {
+        checkAuth({ commit }) {
+            fetch(`${process.env.API_URI_V1}/auth/check`, {
+                credentials: "include",
+            })
+                .then((response) => {
+                    if(response.ok) {
+                        response.json()
+                            .then((data) => {
+                                commit("FETCH_AUTH", data.message);
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        },
         getVersion({ commit }) {
-            fetch(`${process.env.API_URI_V1}/utilities/version`)
+            fetch(`${process.env.API_URI_V1}/utilities/version`, {
+                credentials: "include",
+            })
                 .then((response) => {
                     response.json()
                         .then((data) => {
