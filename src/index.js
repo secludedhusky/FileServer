@@ -9,6 +9,9 @@ import store from "./plugins/store";
 // Components
 import App from "./components/pages/App.vue";
 
+import moment from "moment";
+Vue.prototype.moment = moment;
+
 // Main Ap
 let app = new Vue({
     store: store,

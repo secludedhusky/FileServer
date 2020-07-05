@@ -35,10 +35,17 @@ class Authentication extends RouteBase {
     }
 
     async checkDuplicates(request) {
-        let check = await database.select("user_name, user_email", process.env.USER_TABLE_V1, [
-            { user_name: request.username },
-            { user_email: request.email }
-        ], true);
+        let check = await database.select({
+            columns: "user_name, user_email",
+            from: process.env.USER_TABLE_V1,
+            where: [
+                { user_name: request.username },
+                { user_email: request.email }
+            ],
+            options: {
+                singleItem: true
+            }
+        });
 
         let conflicts = [];
         if (check.hasOwnProperty("user_name") && check.user_name === request.username) {

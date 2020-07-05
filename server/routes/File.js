@@ -9,6 +9,8 @@ const fs = require('fs-extra');
 const mime = require("mime-types");
 const { v4: uuid } = require("uuid");
 
+const moment = require("moment");
+
 class FileGet extends RouteBase {
 
     constructor() {
@@ -24,7 +26,14 @@ class FileGet extends RouteBase {
         if (req.headers.hasOwnProperty("authorization") && RegEx.exec(req.headers.authorization)) {
             let incomingToken = req.headers.authorization;
 
-            let token = await database.select("token_revoked", process.env.TOKEN_TABLE_V1, { token_value: incomingToken }, true)
+            let token = await database.select({
+                columns: "token_revoked, token_user",
+                from: process.env.TOKEN_TABLE_V1,
+                where: { token_value: incomingToken },
+                options: {
+                    singleItem: true
+                }
+            })
                 .catch((error) => {
                     console.log(error);
                     res.status(500).send({
@@ -44,6 +53,7 @@ class FileGet extends RouteBase {
                         let fileExt = path.extname(filename);
                         let newFilename = `${requestId}${fileExt}`;
                         let filePath = `${__dirname}/public/${newFilename}`;
+                        let uploadUrl = `${(process.env.NODE_ENV === "production" ? "https" : `http`)}://${req.hostname}${(process.env.NODE_ENV === "production" ? "" : `:${process.env.APP_PORT}`)}${process.env.API_V1}/${requestId}`;
                         let fileMime = mime.lookup(filename);
 
                         let stream = fs.createWriteStream(filePath);
@@ -59,21 +69,24 @@ class FileGet extends RouteBase {
                         })
 
                         stream.on('close', function () {
+
                             console.log("Uploaded: ", filename);
 
                             database.insert(process.env.UPLOAD_TABLE_V1, {
                                 id: requestId,
                                 upload_path: filePath,
-                                upload_user: "todo",
+                                upload_url: uploadUrl,
+                                upload_user: token.token_user,
                                 upload_filename: filename,
-                                upload_mime: fileMime
+                                upload_mime: fileMime,
+                                upload_date: moment(new Date()).format("YYYY-MM-DD HH:mm:ss")
                             })
                                 .then((r) => {
                                     res.status(200)
                                         .send({
                                             status: 200,
                                             data: {
-                                                link: `${(process.env.NODE_ENV === "production" ? "https" : `http`)}://${req.hostname}${(process.env.NODE_ENV === "production" ? "" : `:${process.env.APP_PORT}`)}${process.env.API_V1}/${requestId}`
+                                                link: uploadUrl
                                             }
                                         });
                                 })
@@ -122,7 +135,11 @@ class FileGet extends RouteBase {
         let fileId = req.params.uuid;
 
         if (RegEx.exec(fileId)) {
-            database.select("*", process.env.UPLOAD_TABLE_V1, { id: fileId })
+            database.select({
+                columns: "*",
+                from: process.env.UPLOAD_TABLE_V1,
+                where: { id: fileId }
+            })
                 .then((r) => {
                     if (r.length > 0) {
                         let fileData = r[0];
@@ -175,12 +192,11 @@ class FileGet extends RouteBase {
                 secure: req.secure,
                 xhr: req.xhr
             }),
-            view_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            view_date: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
             view_id: fileId
         })
             .catch((error) => { console.error(error); });
     }
-
 
     GetRoutes() {
         return (() => {

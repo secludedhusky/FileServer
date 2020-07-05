@@ -24,7 +24,14 @@ class RouteBase {
     }
 
     async loginStrategy(username, password, done) {
-        let data = await this.database.select("id, user_name, user_email, user_pass", process.env.USER_TABLE_V1, { user_name: username }, true)
+        let data = await this.database.select({
+            columns: "id, user_name, user_email, user_pass",
+            from: process.env.USER_TABLE_V1,
+            where: { user_name: username },
+            options: {
+                singleItem: true
+            }
+        })
             .catch((error) => {
                 done(error);
             });

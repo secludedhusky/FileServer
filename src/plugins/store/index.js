@@ -77,8 +77,10 @@ export default new Vuex.Store({
         getStats(state, data) {
             state.app = data;
         },
+
         getFiles(state, data) {
             state.user.files = data;
+            console.log(data);
         },
     },
     actions: {
@@ -204,18 +206,28 @@ export default new Vuex.Store({
                 });
 
         },
-        getFiles({ commit }, self) {
-            let examples = [];
-            for (let i = 0; i < 50; i++) {
-                let id = uuid();
-                examples.push({
-                    id: `${id}`,
-                    name: `${id}.png`,
-                    url: `https://ss1.projectge.com/api/v1/${id}`
-                });
-            }
 
-            commit("getFiles", examples);
+        getFiles({ commit }, self) {
+            return fetch(`${process.env.API_URI_V1}/user/files`)
+                .then((r) => {
+                    switch (r.status) {
+                        case 200:
+                            r.json()
+                                .then((data) => {
+                                    commit("getFiles", data.data);
+                                });
+                            break;
+                        case 401:
+                            commit("noAuth", self);
+                            break;
+                        default:
+                            console.error("Unknown status");
+                            break;
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
         },
 
         logout({ commit }, self) {

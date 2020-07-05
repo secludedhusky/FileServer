@@ -26,6 +26,7 @@
     "fs-extra": "^9.0.1",
     "git-repo-info": "^2.1.1",
     "mime-types": "^2.1.27",
+    "moment": "^2.27.0",
     "mysql": "^2.18.1",
     "packages": "0.0.8",
     "passport": "^0.4.1",
@@ -33,6 +34,7 @@
     "style-loader": "^1.2.1",
     "uuid": "^8.2.0",
     "vue": "^2.6.11",
+    "vue-moment": "^4.1.0",
     "vue-router": "^3.3.4",
     "vuetify": "^2.3.3",
     "vuex": "^3.5.1"

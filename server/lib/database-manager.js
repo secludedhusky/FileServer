@@ -44,10 +44,10 @@ class DatabaseManager {
 
     /**
      * Selects data from a table.
-     * @param {string} columns | Columns to pick from the database
-     * @param {string} table   | Table to get data from
-     * @param {object/array} where   | Where conditions to be used
-     * @example 
+     * @param {object} options | Options for the selection.
+     * // todo: document option inputs
+     * 
+     * @example where
      *      [
      *          {cond, cond}, -- Each item will be concatenated with AND
      *                        -- Inserts an OR before the next set of conditions
@@ -57,14 +57,25 @@ class DatabaseManager {
      *      -- WHERE condition OR condition
      */
 
-    async select(columns, table, where, returnFirst = false) {
+    async select(options) {
+        let columns = options.columns,
+            table = options.from,
+            where = options.where || undefined,
+            join = options.join || undefined,
+            first = false;
+
+        if (options.options) {
+            first = options.options.singleItem || false;
+        }
+
         return new Promise(async (resolve, reject) => {
             let tableParams = [table];
-            let queryAppendix = "";
+            let selectStatement = "";
+            let joinStatement = "";
+            let groupStatement = "";
 
-            if (where != undefined && Object.keys(where).length > 0) {
-                queryAppendix += "WHERE ?";
-
+            if (where) {
+                selectStatement += "WHERE ?";
                 if (Array.isArray(where)) {
                     for (let i = 0; i < where.length; i++) {
                         let keys = Object.keys(where[i]);
@@ -73,11 +84,11 @@ class DatabaseManager {
                         });
 
                         if (keys.length > 1) {
-                            queryAppendix += "AND ?".repeat(keys.length - 1);
+                            selectStatement += "AND ?".repeat(keys.length - 1);
                         }
 
                         if (i < where.length - 1) {
-                            queryAppendix += " OR ?";
+                            selectStatement += " OR ?";
                         }
                     }
                 } else {
@@ -87,9 +98,14 @@ class DatabaseManager {
                     });
 
                     if (keys.length > 1) {
-                        queryAppendix += " AND ?".repeat(keys.length - 1);
+                        selectStatement += " AND ?".repeat(keys.length - 1);
                     }
                 }
+            }
+
+            if (join) {
+                joinStatement = ` ${join.mode} JOIN ${join.on.table} ON ${table}.${join.from.id}=${join.on.table}.${join.on.id}`;
+                groupStatement = ` GROUP BY ${join.groupBy} `;
             }
 
             let connection = await this.getConnection()
@@ -98,7 +114,7 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`SELECT ${columns} FROM ?? ${queryAppendix}`, tableParams, function (error, results, fields) {
+                connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement}`, tableParams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }
@@ -106,7 +122,7 @@ class DatabaseManager {
                     connection.release();
 
                     if (results && results.length > 0) {
-                        resolve(returnFirst ? results[0] : results);
+                        resolve(first ? results[0] : results);
                     } else {
                         resolve(results);
                     }
@@ -114,6 +130,7 @@ class DatabaseManager {
             }
         });
     }
+
 
     /**
      * Updates data in a table
@@ -124,7 +141,7 @@ class DatabaseManager {
     async update(table, set, where) {
         return new Promise(async (resolve, reject) => {
             let tableparams = [table, set];
-            let queryAppendix = '';
+            let selectStatement = '';
 
             if (where != null) {
                 Object.keys(where).forEach((key) => {
@@ -133,8 +150,8 @@ class DatabaseManager {
             }
 
             if (tableparams.length > 2) {
-                queryAppendix = 'WHERE ?';
-                queryAppendix += ' AND ?'.repeat(tableparams.length - 3);
+                selectStatement = 'WHERE ?';
+                selectStatement += ' AND ?'.repeat(tableparams.length - 3);
             }
 
             let connection = await this.getConnection()
@@ -143,7 +160,7 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`UPDATE ?? SET ? ${queryAppendix}`, tableparams, (error, results, fields) => {
+                connection.query(`UPDATE ?? SET ? ${selectStatement}`, tableparams, (error, results, fields) => {
                     if (error) {
                         reject(error);
                     }
@@ -214,7 +231,7 @@ class DatabaseManager {
     async delete(table, where) {
         return new Promise(async (resolve, reject) => {
             let tableparams = [table];
-            let queryAppendix = '';
+            let selectStatement = '';
 
             if (where != null) {
                 Object.keys(where).forEach((key) => {
@@ -223,8 +240,8 @@ class DatabaseManager {
             }
 
             if (tableparams.length > 1) {
-                queryAppendix = 'WHERE ?';
-                queryAppendix += ' AND ?'.repeat(tableparams.length - 2);
+                selectStatement = 'WHERE ?';
+                selectStatement += ' AND ?'.repeat(tableparams.length - 2);
             }
 
             let connection = await this.getConnection()
@@ -233,7 +250,7 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`DELETE FROM ?? ${queryAppendix}`, tableparams, function (error, results, fields) {
+                connection.query(`DELETE FROM ?? ${selectStatement}`, tableparams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }
