@@ -15,7 +15,7 @@ export default {
     },
     created() {
         if (this.$store.getters.loggedIn) {
-            this.$router.push("dashboard", this);
+            this.$router.push("dashboard");
         }
     }
 };

@@ -10,11 +10,9 @@ export default {
     name: "status",
     created() {
         this.$store.dispatch("getStats", this);
-        this.$nextTick(function() {
-            if (!this.$store.getters.loggedIn) {
-                this.$router.push("login");
-            }
-        });
+        if (!this.$store.getters.loggedIn) {
+            this.$router.push("login");
+        }
     }
 };
 </script> 
