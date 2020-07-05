@@ -44,8 +44,7 @@
 </template>
 
 <script>
-import 'babel-polyfill';
-
+import "babel-polyfill";
 import store from "../../store";
 
 export default {
@@ -94,12 +93,9 @@ export default {
                 this.$router.push(page);
             }
         },
-        async checkLogin() {}
     },
-    async created() {
-        console.log("App dispatch");
-        
-        this.$store.dispatch("checkAuth");
+    created() {
+        this.$store.dispatch("checkAuth", this);
         this.dataReady = true;
     }
 };

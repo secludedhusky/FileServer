@@ -72,7 +72,7 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
-            'process.env.API_URI_V1': `'${API_URI_V1}'`
+            'process.env.API_URI_V1': `'${process.env.API_URI_V1}'`
         }),
         new HtmlWebpackPlugin({
             title: "index",

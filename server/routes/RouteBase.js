@@ -1,7 +1,7 @@
 const passport = require("passport");
-const bcrypt = require('bcrypt');
-
 const LocalStrategy = require('passport-local').Strategy;
+
+const bcrypt = require('bcrypt');
 const DatabaseManager = require("../lib/database-manager");
 
 class RouteBase {
@@ -13,24 +13,29 @@ class RouteBase {
         // Passport
         this.passport = passport;
 
-        this.passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async (u, p, d) => { await this.loginStrategy(u, p, d) }));
+        this.passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async (u, p, d) => {
+            await this.loginStrategy(u, p, d)
+                .catch((error) => {
+                    console.error(error.message);
+                })
+        }));
         this.passport.serializeUser(function (user, done) { done(null, user); });
         this.passport.deserializeUser(function (user, done) { done(null, user); });
     }
 
     async loginStrategy(username, password, done) {
-        let data = await this.database.select("id, user_name, user_email, user_pass", process.env.USER_TABLE_V1, { user_name: username })
+        let data = await this.database.select("id, user_name, user_email, user_pass", process.env.USER_TABLE_V1, { user_name: username }, true)
             .catch((error) => {
                 done(error);
             });
 
-        if (data.length > 0 && data[0].user_name === username) {
-            let match = bcrypt.compare(password, data[0].user_pass);
+        if (data.user_name === username) {
+            let match = bcrypt.compare(password, data.user_pass);
             if (match) {
                 done(null, {
-                    id: data[0].id,
-                    username: data[0].user_name,
-                    email: data[0].user_email
+                    id: data.id,
+                    username: data.user_name,
+                    email: data.user_email
                 });
             } else {
                 done(null, false, { message: "Invalid password" });

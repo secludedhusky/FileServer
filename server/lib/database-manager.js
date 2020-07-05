@@ -56,12 +56,12 @@ class DatabaseManager {
      *      -- WHERE condition OR condition
      */
 
-    async select(columns, table, where) {
+    async select(columns, table, where, returnFirst = false) {
         return new Promise(async (resolve, reject) => {
             let tableParams = [table];
             let queryAppendix = "";
 
-            if (where != undefined) {
+            if (where != undefined && Object.keys(where).length > 0) {
                 queryAppendix += "WHERE ?";
 
                 if (Array.isArray(where)) {
@@ -103,7 +103,12 @@ class DatabaseManager {
                     }
 
                     connection.release();
-                    resolve(results);
+
+                    if (returnFirst) {
+                        resolve(results.length > 0 ? results[0] : results);
+                    } else {
+                        resolve(results);
+                    }
                 });
             }
         });

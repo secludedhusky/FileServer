@@ -27,6 +27,13 @@ export default {
     name: "dashboard",
     components: {
         FileList
+    },
+    created: function() {
+        this.$nextTick(function() {
+            if(!this.$store.getters.loggedIn){
+                this.$router.push("login");
+            }
+        });
     }
 };
 </script>

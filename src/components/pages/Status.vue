@@ -1,23 +1,20 @@
 <template>
     <v-container>
         <h1>Status</h1>
-        <p>
-            App Version: {{ this.$store.getters.appVersion }}
-        </p>
+        <p>App Version: {{ this.$store.getters.appVersion }}</p>
     </v-container>
 </template>
 
 <script>
 export default {
     name: "status",
-    async created() {
-        console.log("Status dispatch");
-
-        await this.$store.dispatch("checkAuth");
-
-        
-
-        this.$store.dispatch("getVersion", { self: this });
+    created() {
+        this.$store.dispatch("getStats", this);
+        this.$nextTick(function() {
+            if (!this.$store.getters.loggedIn) {
+                this.$router.push("login");
+            }
+        });
     }
 };
 </script> 

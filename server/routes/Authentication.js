@@ -35,16 +35,14 @@ class Authentication extends RouteBase {
         let check = await database.select("user_name, user_email", process.env.USER_TABLE_V1, [
             { user_name: request.username },
             { user_email: request.email }
-        ]);
+        ], true);
 
         let conflicts = [];
-        if (check.length > 0) {
-            if (check[0].hasOwnProperty("user_name") && check[0].user_name === request.username) {
-                conflicts.push("user_name");
-            }
-            if (check[0].hasOwnProperty("user_email") && check[0].user_email === request.email) {
-                conflicts.push("user_email");
-            }
+        if (check.hasOwnProperty("user_name") && check.user_name === request.username) {
+            conflicts.push("user_name");
+        }
+        if (check.hasOwnProperty("user_email") && check.user_email === request.email) {
+            conflicts.push("user_email");
         }
 
         return {
@@ -53,7 +51,7 @@ class Authentication extends RouteBase {
         };
     }
 
-    async check (req, res) {
+    async check(req, res) {
         res.status(200).send({
             status: 200,
             message: "Success",

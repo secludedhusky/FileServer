@@ -12,9 +12,8 @@ const cors = require('cors');
 require('dotenv').config();
 
 // Middleware
-const UploadFile = require("./server/routes/FileUpload");
-const GetFile = require("./server/routes/FileGet");
-const Utilities = require("./server/routes/Utilities");
+const File = require("./server/routes/File");
+const Server = require("./server/routes/Server");
 const Authentication = require("./server/routes/Authentication");
 const Dashboard = require("./server/routes/Dashboard");
 
@@ -41,9 +40,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Custom Routes
-app.use(`${process.env.API_V1}`, new UploadFile().GetRoutes());
-app.use(`${process.env.API_V1}`, new GetFile().GetRoutes());
-app.use(`${process.env.API_V1}/utilities`, new Utilities().GetRoutes());
+app.use(`${process.env.API_V1}`, new File().GetRoutes());
+app.use(`${process.env.API_V1}/server`, new Server().GetRoutes());
 app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());
 app.use(`${process.env.API_V1}/dashboard`, new Dashboard().GetRoutes());
 

@@ -36,7 +36,9 @@ export default new Vuex.Store({
         },
     },
     mutations: {
-        NO_AUTH(state, data) {
+        noAuth(state, self) {
+            console.log(self)
+            console.log("Commit::noAuth");
             state.user = {
                 loggedIn: false,
                 id: "",
@@ -44,8 +46,13 @@ export default new Vuex.Store({
                 email: "",
                 files: [],
             }
+
+            if (self.$router.history.current.name !== "login") {
+                self.$router.push("login");
+            }
         },
-        FETCH_AUTH(state, data) {
+        checkAuth(state, data) {
+            console.log("Commit::checkAuth");
             state.user = {
                 loggedIn: true,
                 id: data.id,
@@ -54,70 +61,84 @@ export default new Vuex.Store({
                 files: state.user.files
             }
         },
-        FETCH_VERSION(state, data) {
-            state.app = {
-                version: data.version,
-                branch: data.branch
-            }
+        getStats(state, data) {
+            console.log("Commit::getStats");
+            state.app = data;
         },
-        FETCH_UPLOADS(state, data) {
-            state.app.uploads = data.version;
-        },
-        FETCH_VIEWS(state, version) {
-            state.app.version = data.version;
-        },
-        FETCH_FILES(state, data) {
+        getFiles(state, data) {
+            console.log("Commit::getFiles");
             state.user.files = data;
         }
     },
     actions: {
-        checkAuth({ commit }) {
-            return fetch(`${process.env.API_URI_V1}/auth/check`, {
-                credentials: "include",
-            })
+        checkAuth({ commit }, self) {
+            return fetch(`${process.env.API_URI_V1}/auth/check`, { credentials: "include", })
                 .then((response) => {
-                    if(response.ok) {
-                        response.json()
-                            .then((data) => {
-                                commit("FETCH_AUTH", data.data);
-                            });
+                    switch (response.status) {
+                        case 200:
+                            response.json()
+                                .then((data) => {
+                                    commit("checkAuth", data.data);
+                                });
+                            break;
+                        case 401:
+                            commit("noAuth", self);
+                            break;
+                        default:
+                            console.error("Unknown status");
+                            break;
                     }
                 })
                 .catch((error) => {
                     console.error(error);
                 });
         },
-        getVersion({ commit }) {
-            return fetch(`${process.env.API_URI_V1}/utilities/version`, {
-                credentials: "include",
-            })
+        getVersion({ commit }, self) {
+            return fetch(`${process.env.API_URI_V1}/server/version`, { credentials: "include", })
                 .then((response) => {
-                    if(response.ok) {
-                        response.json()
-                            .then((data) => {
-                                commit("FETCH_VERSION", data.message);
-                            });
-                    } else {
-                        if(response.status === 409) {
-                            commit("NO_AUTH");
-                        }
+                    switch (response.status) {
+                        case 200:
+                            response.json()
+                                .then((data) => {
+                                    commit("getVersion", data.data);
+                                });
+                            break;
+                        case 401:
+                            commit("noAuth", self);
+                            break;
+                        default:
+                            console.error("Unknown status");
+                            break;
                     }
                 })
                 .catch((error) => {
-                    console.error("error", error);
+                    console.error(error);
                 });
         },
-        getViews({ commit }, { self }) {
-            return fetch(`${process.env.API_URI_V1}/utilities/views`)
+        getStats({ commit }, self) {
+            return fetch(`${process.env.API_URI_V1}/server/stats`)
                 .then((response) => {
-                    console.log(response);
+                    switch (response.status) {
+                        case 200:
+                            response.json()
+                                .then((data) => {
+                                    commit("getStats", data.data);
+                                });
+                            break;
+                        case 401:
+                            commit("noAuth", self);
+                            break;
+                        default:
+                            console.error("Unknown status");
+                            break;
+                    }
                 })
                 .catch((error) => {
                     console.error(error);
                 });
 
         },
-        getFiles({ commit }) {
+        getFiles({ commit }, self) {
             let examples = [];
             for (let i = 0; i < 50; i++) {
                 let id = uuid();
@@ -128,7 +149,7 @@ export default new Vuex.Store({
                 });
             }
 
-            commit("FETCH_FILES", examples);
+            commit("getFiles", examples);
         }
     }
 });
