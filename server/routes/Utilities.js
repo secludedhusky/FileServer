@@ -15,7 +15,7 @@ class Utilities extends RouteBase {
         res.set({ "Content-Type": "application/json" }).status(200)
             .send({
                 status: 200,
-                message: [{ version: gitInfo.sha, branch: gitInfo.branch }]
+                message: { version: gitInfo.sha, branch: gitInfo.branch }
             });
     }
 
@@ -62,7 +62,7 @@ class Utilities extends RouteBase {
             var router = require("express").Router();
 
             router.get("/version", this.getVersion);
-            router.get("/stats", this.getFileCount);
+            router.get("/uploads", this.getFileCount);
             router.get("/views", this.getViewCount);
 
             return router;

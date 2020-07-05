@@ -35,7 +35,7 @@
                     </v-main>
 
                     <v-footer app>
-                        <span>&copy; {{ new Date().getFullYear() }} : {{ this.$store.getters.loggedIn }}</span>
+                        <span>{{ copy }} &copy; {{ new Date().getFullYear() }} | {{ this.$store.getters.appVersion }}</span>
                     </v-footer>
                 </v-app>
             </v-app>
@@ -44,6 +44,8 @@
 </template>
 
 <script>
+import store from "../../store";
+
 export default {
     name: "app-main",
 
@@ -55,6 +57,7 @@ export default {
         }
     },
     data: () => ({
+        copy: "XenPowered",
         drawer: true,
         loggedIn: false,
         items: [
@@ -90,6 +93,9 @@ export default {
                 this.$router.push(page);
             }
         }
+    },
+    created() {
+        this.$store.dispatch("getVersion", { self: this});
     },
     mounted() {
         console.log(this.$store.getters.loggedIn);

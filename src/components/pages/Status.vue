@@ -15,7 +15,7 @@ export default {
         }
     },
     created: function () {
-        if(!this.$store.state.user.loggedIn) {
+        if(!this.$store.getters.loggedIn) {
             this.$router.push("login");
         }
     } 
