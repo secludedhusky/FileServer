@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
-import Home from "./components/pages/Home.vue";
-import Login from "./components/pages/Login.vue";
-import Register from "./components/pages/Register.vue";
-import Status from "./components/pages/Status.vue";
-import Dashboard from "./components/pages/Dashboard.vue";
+import Home from "../../components/pages/Home.vue";
+import Login from "../../components/pages/Login.vue";
+import Register from "../../components/pages/Register.vue";
+import Status from "../../components/pages/Status.vue";
+import Dashboard from "../../components/pages/Dashboard.vue";
 
 Vue.use(VueRouter);
 

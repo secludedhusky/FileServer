@@ -15,7 +15,7 @@ require('dotenv').config();
 const File = require("./server/routes/File");
 const Server = require("./server/routes/Server");
 const Authentication = require("./server/routes/Authentication");
-const Dashboard = require("./server/routes/Dashboard");
+const User = require("./server/routes/User");
 
 // App Initialisation
 const app = express();
@@ -43,17 +43,15 @@ app.use(bodyParser.json());
 app.use(`${process.env.API_V1}`, new File().GetRoutes());
 app.use(`${process.env.API_V1}/server`, new Server().GetRoutes());
 app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());
-app.use(`${process.env.API_V1}/dashboard`, new Dashboard().GetRoutes());
+app.use(`${process.env.API_V1}/user`, new User().GetRoutes());
 
 // Start App
 (async function () {
     app.use(router);
     app.listen(port, function () {
         console.log(`Server is listening for connection.`);
-
         app.get("/", (req, res) => {
             res.send("Hello, world!");
         });
-
     });
 })();

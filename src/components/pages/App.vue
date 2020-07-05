@@ -45,7 +45,7 @@
 
 <script>
 import "babel-polyfill";
-import store from "../../store";
+import store from "../../plugins/store";
 
 export default {
     name: "app-main",

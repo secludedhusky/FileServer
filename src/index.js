@@ -1,16 +1,13 @@
 // Imports
 import Vue from "vue";
-import vuetify from "./plugins/vuetify"
 
+// Plugins
+import vuetify from "./plugins/vuetify";
+import router from './plugins/router';
+import store from "./plugins/store";
 
 // Components
 import App from "./components/pages/App.vue";
-
-// Router
-import router from './router.js';
-
-// Store
-import store from "./store";
 
 // Main Ap
 let app = new Vue({
