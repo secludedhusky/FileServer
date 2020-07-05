@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const { query } = require("express");
 
 /**
  * Database Manager
@@ -44,23 +45,50 @@ class DatabaseManager {
      * Selects data from a table.
      * @param {string} columns | Columns to pick from the database
      * @param {string} table   | Table to get data from
-     * @param {object} where   | Where conditions to be used
+     * @param {object/array} where   | Where conditions to be used
+     * @example 
+     *      [
+     *          {cond, cond}, -- Each item will be concatenated with AND
+     *                        -- Inserts an OR before the next set of conditions
+     *          {cond, cond}  -- Each item will be concatenated with AND
+     *      ]
+     *      -- WHERE (condition AND condition) or (cond AND cond)
+     *      -- WHERE condition OR condition
      */
 
-    async select(columns, table, where) {
+    async select(columns, table, where, returnFirst = false) {
         return new Promise(async (resolve, reject) => {
-            let tableparams = [table];
-            let queryAppendix = '';
+            let tableParams = [table];
+            let queryAppendix = "";
 
-            if (where != undefined) {
-                Object.keys(where).forEach((key) => {
-                    tableparams.push({ [key]: where[key] });
-                })
-            }
+            if (where != undefined && Object.keys(where).length > 0) {
+                queryAppendix += "WHERE ?";
 
-            if (tableparams.length > 1) {
-                queryAppendix = 'WHERE ?';
-                queryAppendix += ' AND ?'.repeat(tableparams.length - 2);
+                if (Array.isArray(where)) {
+                    for (let i = 0; i < where.length; i++) {
+                        let keys = Object.keys(where[i]);
+                        keys.forEach(key => {
+                            tableParams.push({ [key]: where[i][key] });
+                        });
+
+                        if (keys.length > 1) {
+                            queryAppendix += "AND ?".repeat(keys.length - 1);
+                        }
+
+                        if (i < where.length - 1) {
+                            queryAppendix += " OR ?";
+                        }
+                    }
+                } else {
+                    let keys = Object.keys(where);
+                    keys.forEach((key) => {
+                        tableParams.push({ [key]: where[key] });
+                    });
+
+                    if (keys.length > 1) {
+                        queryAppendix += " AND ?".repeat(keys.length - 1);
+                    }
+                }
             }
 
             let connection = await this.getConnection()
@@ -69,13 +97,18 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`SELECT ${columns} FROM ?? ${queryAppendix}`, tableparams, function (error, results, fields) {
+                connection.query(`SELECT ${columns} FROM ?? ${queryAppendix}`, tableParams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }
 
                     connection.release();
-                    resolve(results);
+
+                    if (returnFirst) {
+                        resolve(results.length > 0 ? results[0] : results);
+                    } else {
+                        resolve(results);
+                    }
                 });
             }
         });
