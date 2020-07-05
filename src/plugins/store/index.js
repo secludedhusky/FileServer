@@ -18,7 +18,7 @@ export default new Vuex.Store({
             version: "",
             branch: "",
             uploads: "",
-            views: ""
+            views: "",
         }
     },
     getters: {
@@ -36,9 +36,31 @@ export default new Vuex.Store({
         },
     },
     mutations: {
+        login(state, data) {
+            state.user = {
+                loggedIn: true,
+                id: data.id,
+                username: data.username,
+                email: data.email,
+                files: state.user.files
+            }
+
+            data.self.$router.push("dashboard");
+        },
+        register(state, data) {
+            data.self.accountCreated = true;
+            setTimeout(() => { data.self.$router.push("dashboard"); }, 2000);
+        },
+        checkAuth(state, data) {
+            state.user = {
+                loggedIn: true,
+                id: data.id,
+                username: data.username,
+                email: data.email,
+                files: state.user.files
+            }
+        },
         noAuth(state, self) {
-            console.log(self)
-            console.log("Commit::noAuth");
             state.user = {
                 loggedIn: false,
                 id: "",
@@ -51,26 +73,69 @@ export default new Vuex.Store({
                 self.$router.push("login");
             }
         },
-        checkAuth(state, data) {
-            console.log("Commit::checkAuth");
-            state.user = {
-                loggedIn: true,
-                id: data.id,
-                username: data.username,
-                email: data.email,
-                files: state.user.files
-            }
-        },
+
         getStats(state, data) {
-            console.log("Commit::getStats");
             state.app = data;
         },
         getFiles(state, data) {
-            console.log("Commit::getFiles");
             state.user.files = data;
-        }
+        },
     },
     actions: {
+        login({ commit }, payload) {
+            return new Promise(async (resolve, reject) => {
+                let response = await fetch(`${process.env.API_URI_V1}/auth/login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: payload.username,
+                        password: payload.password
+                    })
+                });
+
+                if (response.ok) {
+                    let data = await response.json()
+                        .catch(error => {
+                            console.error(error);
+                        });
+
+                    commit("login", payload);
+                    resolve(data);
+                } else {
+                    reject(response);
+                }
+
+            });
+        },
+        register({ commit }, payload) {
+            return new Promise(async (resolve, reject) => {
+                let response = await fetch(`${process.env.API_URI_V1}/auth/register`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: payload.email,
+                        username: payload.username,
+                        password: payload.password
+                    })
+                });
+
+                if (response.ok) {
+                    let data = await response.json()
+                        .catch(error => {
+                            console.error(error);
+                        });
+
+                    commit("register", payload);
+                    resolve(data);
+                } else {
+                    reject(response);
+                }
+            });
+        },
         checkAuth({ commit }, self) {
             return fetch(`${process.env.API_URI_V1}/auth/check`, { credentials: "include", })
                 .then((r) => {
@@ -93,6 +158,7 @@ export default new Vuex.Store({
                     console.error(error);
                 });
         },
+
         getVersion({ commit }, self) {
             return fetch(`${process.env.API_URI_V1}/server/version`, { credentials: "include", })
                 .then((r) => {
@@ -151,6 +217,7 @@ export default new Vuex.Store({
 
             commit("getFiles", examples);
         },
+
         logout({ commit }, self) {
             return fetch(`${process.env.API_URI_V1}/auth/logout`)
                 .then((r) => {
@@ -159,6 +226,6 @@ export default new Vuex.Store({
                 .catch((error) => {
                     console.error(error);
                 });
-        }
+        },
     }
 });

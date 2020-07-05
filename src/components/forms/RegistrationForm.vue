@@ -7,61 +7,65 @@
                 </v-col>
             </v-row>
 
-            <div v-if="!accountCreated">
-                <v-row>
-                    <v-col cols="12" sm="12">
-                        <v-text-field
-                            v-model="email"
-                            :rules="emailRules"
-                            :error-messages="emailError"
-                            label="Email"
-                            type="email"
-                            filled
-                            @change="resetValidation('email')"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12" sm="6">
-                        <v-text-field
-                            v-model="username"
-                            :rules="usernameRules"
-                            :error-messages="usernameError"
-                            label="Username"
-                            type="text"
-                            filled
-                            @change="resetValidation('username')"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                        <v-text-field
-                            :rules="passwordRules"
-                            v-model="password"
-                            label="Password"
-                            type="password"
-                            filled
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12" sm="12">
-                        <v-btn
-                            :loading="loading"
-                            :disabled="!valid || loading"
-                            color="secondary"
-                            block
-                            @click="loader = 'loading'; register()"
-                        >
-                            Regsiter
-                            <template v-slot:loader>
-                                <span class="custom-loader">
-                                    <v-icon light>cached</v-icon>
-                                </span>
-                            </template>
-                        </v-btn>
-                    </v-col>
-                </v-row>
-            </div>
+            <v-row v-if="error">
+                <v-col cols="12" sm="12">
+                    <v-alert type="error">{{ error }}</v-alert>
+                </v-col>
+            </v-row>
+
+            <v-row>
+                <v-col cols="12" sm="12">
+                    <v-text-field
+                        v-model="email"
+                        :rules="emailRules"
+                        :error-messages="emailError"
+                        label="Email"
+                        type="email"
+                        filled
+                        @change="resetValidation('email')"
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="12" sm="6">
+                    <v-text-field
+                        v-model="username"
+                        :rules="usernameRules"
+                        :error-messages="usernameError"
+                        label="Username"
+                        type="text"
+                        filled
+                        @change="resetValidation('username')"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-text-field
+                        :rules="passwordRules"
+                        v-model="password"
+                        label="Password"
+                        type="password"
+                        filled
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="12" sm="12">
+                    <v-btn
+                        :loading="loading"
+                        :disabled="!valid || loading"
+                        color="secondary"
+                        block
+                        @click="loader = 'loading'; register()"
+                    >
+                        Regsiter
+                        <template v-slot:loader>
+                            <span class="custom-loader">
+                                <v-icon light>cached</v-icon>
+                            </span>
+                        </template>
+                    </v-btn>
+                </v-col>
+            </v-row>
         </v-container>
     </v-form>
 </template>
@@ -93,13 +97,17 @@ export default {
             ],
 
             password: null,
-            passwordRules: [v => !!v || "Password is required"],
+            passwordRules: [
+                v => !!v || "Password is required",
+                v => (v && v.length > 8) || "Must be at least 8 characters"
+            ],
 
             loader: null,
             loading: false,
 
             lazy: false,
 
+            error: "",
             accountCreated: false
         };
     },
@@ -123,48 +131,42 @@ export default {
             }
         },
         register() {
-            let response = fetch(`${process.env.API_URI_V1}/auth/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: this.email,
-                    username: this.username,
-                    password: this.password
-                })
-            });
+            this.error = "";
 
-            response
-                .then(r => {
-                    if (r.ok) {
-                        this.accountCreated = true;
-                        setTimeout(() => this.$router.push("login"), 2000);
-                    } else {
-                        console.error(`Login failed: ${r.statusText}`);
-                        r.json().then(response => {
-                            console.log(response);
-                            response.data.forEach(conflict => {
-                                switch (conflict) {
-                                    case "user_name":
-                                        this.usernameError =
-                                            "Username is already in use";
-                                        break;
-                                    case "user_email":
-                                        this.emailError =
-                                            "Email is already in use";
-                                        break;
-                                    default:
-                                        // Custom error
-                                        break;
-                                }
-                            });
-                        });
+            this.$store
+                .dispatch("register", {
+                    self: this,
+                    username: this.username,
+                    password: this.password,
+                    email: this.email
+                })
+                .then(response => {
+                    if (response.status != 201) {
+                        this.error = `${response.status} - ${response.statusText}`;
                     }
                     setTimeout(() => (this.loading = false), 1000);
                 })
                 .catch(error => {
-                    console.error(error);
+                    error
+                        .json()
+                        .then(data => {
+                            data.data.forEach(item => {
+                                switch (item) {
+                                    case "user_name":
+                                        this.usernameError =
+                                            "Username is already taken.";
+                                        break;
+                                    case "user_email":
+                                        this.emailError =
+                                            "Email is already taken.";
+                                        break;
+                                }
+                            });
+                        })
+                        .catch(ex => {
+                            this.error = `${error.status} - ${error.statusText}`;
+                        });
+
                     setTimeout(() => (this.loading = false), 1000);
                 });
         }
@@ -173,6 +175,22 @@ export default {
 </script>
 
 <style>
+/* Change autocomplete styles in WebKit */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    border: none;
+    -webkit-text-fill-color: #ffffff;
+    -webkit-box-shadow: none;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 .custom-loader {
     animation: loader 1s infinite;
     display: flex;
