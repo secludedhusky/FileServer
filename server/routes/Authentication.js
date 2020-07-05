@@ -8,6 +8,9 @@ const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, p
 // BCrypt
 const bcrypt = require('bcrypt');
 
+// UUID
+const { v4 : uuid } = require("uuid");
+
 class Authentication extends RouteBase {
     constructor() {
         super();
@@ -127,6 +130,7 @@ class Authentication extends RouteBase {
         bcrypt.hash(req.body.password, 10)
             .then((hash) => {
                 database.insert(process.env.USER_TABLE_V1, {
+                    id: uuid(),
                     user_name: req.body.username,
                     user_pass: hash,
                     user_email: req.body.email,

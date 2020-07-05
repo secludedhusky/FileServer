@@ -49,7 +49,7 @@ class FileGet extends RouteBase {
                     console.log("Uploaded: ", filename);
 
                     database.insert(process.env.UPLOAD_TABLE_V1, {
-                        upload_id: requestId,
+                        id: requestId,
                         upload_path: filePath,
                         upload_user: "todo",
                         upload_filename: filename,
@@ -112,7 +112,7 @@ class FileGet extends RouteBase {
             .catch((error) => { console.error(error); });
 
         if (RegEx.exec(fileId)) {
-            database.select("*", process.env.UPLOAD_TABLE_V1, { upload_id: fileId })
+            database.select("*", process.env.UPLOAD_TABLE_V1, { id: fileId })
                 .then((r) => {
                     if (r.length > 0) {
                         let fileData = r[0];
