@@ -96,7 +96,7 @@ class Authentication extends RouteBase {
     async logout(req, res) {
         req.logout();
 
-        res.set({ "Content-Type": "application/json" }).status(200)
+        res.clearCookie('connect.sid', { path: '/' }).set({ "Content-Type": "application/json" }).status(200)
             .send({
                 status: 200,
                 message: `Logged out.`
