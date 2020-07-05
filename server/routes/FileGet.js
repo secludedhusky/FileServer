@@ -54,7 +54,7 @@ class FileGet extends RouteBase {
                     } else {
                         res.status(500).send({
                             status: 500,
-                            message: error.message
+                            message: "File does not exist"
                         });
                     }
                 })
