@@ -73,10 +73,10 @@ export default new Vuex.Store({
     actions: {
         checkAuth({ commit }, self) {
             return fetch(`${process.env.API_URI_V1}/auth/check`, { credentials: "include", })
-                .then((response) => {
-                    switch (response.status) {
+                .then((r) => {
+                    switch (r.status) {
                         case 200:
-                            response.json()
+                            r.json()
                                 .then((data) => {
                                     commit("checkAuth", data.data);
                                 });
@@ -95,10 +95,10 @@ export default new Vuex.Store({
         },
         getVersion({ commit }, self) {
             return fetch(`${process.env.API_URI_V1}/server/version`, { credentials: "include", })
-                .then((response) => {
-                    switch (response.status) {
+                .then((r) => {
+                    switch (r.status) {
                         case 200:
-                            response.json()
+                            r.json()
                                 .then((data) => {
                                     commit("getVersion", data.data);
                                 });
@@ -117,10 +117,10 @@ export default new Vuex.Store({
         },
         getStats({ commit }, self) {
             return fetch(`${process.env.API_URI_V1}/server/stats`)
-                .then((response) => {
-                    switch (response.status) {
+                .then((r) => {
+                    switch (r.status) {
                         case 200:
-                            response.json()
+                            r.json()
                                 .then((data) => {
                                     commit("getStats", data.data);
                                 });
@@ -150,6 +150,15 @@ export default new Vuex.Store({
             }
 
             commit("getFiles", examples);
+        },
+        logout({ commit }, self) {
+            return fetch(`${process.env.API_URI_V1}/auth/logout`)
+                .then((r) => {
+                    commit("noAuth", self);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
         }
     }
 });

@@ -9,9 +9,10 @@
 export default {
     name: "status",
     created() {
-        this.$store.dispatch("getStats", this);
         if (!this.$store.getters.loggedIn) {
             this.$router.push("login");
+        } else {
+            this.$store.dispatch("getStats", this);
         }
     }
 };

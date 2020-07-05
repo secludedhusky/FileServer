@@ -94,10 +94,12 @@ class Authentication extends RouteBase {
     }
 
     async logout(req, res) {
-        res.set({ "Content-Type": "application/json" }).status(401)
+        req.logout();
+
+        res.set({ "Content-Type": "application/json" }).status(200)
             .send({
-                status: 401,
-                message: `Unauthorized`
+                status: 200,
+                message: `Logged out.`
             });
     }
 
@@ -170,7 +172,7 @@ class Authentication extends RouteBase {
             router.post("/login", this.passport.authenticate('local'), this.login);
 
             router.post("/register", (req, res) => { this.register(req, res); });
-            router.get("/logout", (req, res) => { this.logout(req, res); });
+            router.get("/logout", this.isAuthenticated, (req, res) => { this.logout(req, res); });
 
             return router;
         })();

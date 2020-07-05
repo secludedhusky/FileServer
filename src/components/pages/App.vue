@@ -80,6 +80,12 @@ export default {
                 authRequired: false
             },
             {
+                path: "/logout",
+                title: "Logout",
+                icon: "mdi-logout",
+                authRequired: true
+            },
+            {
                 path: "/register",
                 title: "Register",
                 icon: "mdi-account",
