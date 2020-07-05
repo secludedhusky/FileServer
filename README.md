@@ -6,6 +6,9 @@ Simple file server for ShareX with web interface
 2) `npm run build` or `npm run serve` (client-side)
 3) `npm run start` (server)
 
+# Todo:
+* Split server / client to separate deps.
+
 # Environment Configuration
 Create these file locally, don't commit them!
 
