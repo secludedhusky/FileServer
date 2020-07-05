@@ -154,7 +154,7 @@ class FileGet extends RouteBase {
             var router = require("express").Router();
 
             router.get("/:uuid", this.getFile);
-            router.post("/upload", this.uploadFile);
+            router.post("/", this.uploadFile);
 
             return router;
         })();
