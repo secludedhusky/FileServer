@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const { query } = require("express");
+const { response } = require("express");
 
 /**
  * Database Manager
@@ -104,10 +105,10 @@ class DatabaseManager {
 
                     connection.release();
 
-                    if (returnFirst) {
-                        resolve(results.length > 0 ? results[0] : results);
+                    if (results) {
+                        resolve(returnFirst ? results[0] : results);
                     } else {
-                        resolve(results);
+                        reject("Could not find a token.");
                     }
                 });
             }

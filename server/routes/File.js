@@ -21,67 +21,94 @@ class FileGet extends RouteBase {
      * @param {object} res | Handle responses
      */
     async uploadFile(req, res) {
-        req.pipe(req.busboy);
-        req.busboy.on('file', function (fieldname, file, filename) {
-            try {
-                console.log("Uploading:", filename);
-
-                let requestId = uuid();
-
-                let fileExt = path.extname(filename);
-                let newFilename = `${requestId}${fileExt}`;
-                let filePath = `${__dirname}/public/${newFilename}`;
-                let fileMime = mime.lookup(filename);
-
-                let stream = fs.createWriteStream(filePath);
-                file.pipe(stream);
-
-                stream.on('error', (error) => {
+        if (req.headers.hasOwnProperty("authorization") && RegEx.exec(req.headers.authorization)) {
+            let token = await database.select("token_revoked", process.env.TOKEN_TABLE_V1, { token_value: req.headers.authorization }, true)
+                .catch((error) => {
                     console.log(error);
-                    res.status(500)
-                        .send({
-                            status: 500,
-                            message: `An error occured: ${error.message}`
-                        });
+                    res.status(500).send({
+                        status: 500,
+                        message: "Internal server error"
+                    });
                 })
 
-                stream.on('close', function () {
-                    console.log("Uploaded: ", filename);
+            if (token && !token.token_revoked) {
+                req.pipe(req.busboy);
+                req.busboy.on('file', function (fieldname, file, filename) {
+                    try {
+                        console.log("Uploading:", filename);
 
-                    database.insert(process.env.UPLOAD_TABLE_V1, {
-                        id: requestId,
-                        upload_path: filePath,
-                        upload_user: "todo",
-                        upload_filename: filename,
-                        upload_mime: fileMime
-                    })
-                        .then((r) => {
-                            res.set({ "Content-Type": "application/json" }).status(200)
-                                .send({
-                                    status: 200,
-                                    data: {
-                                        link: `${(process.env.NODE_ENV === "production" ? "https" : `http`)}://${req.hostname}${(process.env.NODE_ENV === "production" ? "" : `:${process.env.APP_PORT}`)}${process.env.API_V1}/${requestId}`
-                                    }
-                                });
-                        })
-                        .catch((error) => {
+                        let requestId = uuid();
+
+                        let fileExt = path.extname(filename);
+                        let newFilename = `${requestId}${fileExt}`;
+                        let filePath = `${__dirname}/public/${newFilename}`;
+                        let fileMime = mime.lookup(filename);
+
+                        let stream = fs.createWriteStream(filePath);
+                        file.pipe(stream);
+
+                        stream.on('error', (error) => {
+                            console.log(error);
                             res.status(500)
                                 .send({
                                     status: 500,
-                                    message: error.message
+                                    message: `Internal server error`
                                 });
-                            console.error("Upload successful, but the file was not recorded in the DB.", error);
+                        })
+
+                        stream.on('close', function () {
+                            console.log("Uploaded: ", filename);
+
+                            database.insert(process.env.UPLOAD_TABLE_V1, {
+                                id: requestId,
+                                upload_path: filePath,
+                                upload_user: "todo",
+                                upload_filename: filename,
+                                upload_mime: fileMime
+                            })
+                                .then((r) => {
+                                    res.set({ "Content-Type": "application/json" }).status(200)
+                                        .send({
+                                            status: 200,
+                                            data: {
+                                                link: `${(process.env.NODE_ENV === "production" ? "https" : `http`)}://${req.hostname}${(process.env.NODE_ENV === "production" ? "" : `:${process.env.APP_PORT}`)}${process.env.API_V1}/${requestId}`
+                                            }
+                                        });
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                    res.status(500)
+                                        .send({
+                                            status: 500,
+                                            message: error.message
+                                        });
+                                });
                         });
+                    } catch (error) {
+                        console.log(error);
+                        res.status(500)
+                            .send({
+                                status: 500,
+                                message: error.message
+                            });
+                    }
                 });
-            } catch (error) {
-                console.log(error);
-                res.status(500)
+            } else {
+                console.log(`Token has been revoked.`);
+                res.status(401)
                     .send({
-                        status: 500,
-                        message: error.message
+                        status: 401,
+                        message: `Token has been revoked.`
                     });
             }
-        });
+        } else {
+            console.log(`Invalid token provided: ${req.headers.authorization}`);
+            res.status(401)
+                .send({
+                    status: 401,
+                    message: `Invalid token provided.`
+                });
+        }
     }
 
     async getFile(req, res) {
