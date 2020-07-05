@@ -13,5 +13,10 @@ export default {
     components: {
         LoginForm
     },
+    created() {
+        if (this.$store.getters.loggedIn) {
+            this.$router.push("dashboard");
+        }
+    }
 };
 </script>

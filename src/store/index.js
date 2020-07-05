@@ -25,6 +25,9 @@ export default new Vuex.Store({
         loggedIn: state => {
             return state.user.loggedIn;
         },
+        getUsername: state => {
+            return state.user.username;
+        },
         appVersion: state => {
             return `${state.app.branch} ${state.app.version}`;
         },
@@ -33,13 +36,22 @@ export default new Vuex.Store({
         },
     },
     mutations: {
+        NO_AUTH(state, data) {
+            state.user = {
+                loggedIn: false,
+                id: "",
+                username: "",
+                email: "",
+                files: [],
+            }
+        },
         FETCH_AUTH(state, data) {
             state.user = {
                 loggedIn: true,
                 id: data.id,
                 username: data.username,
                 email: data.email,
-                files: []
+                files: state.user.files
             }
         },
         FETCH_VERSION(state, data) {
@@ -60,14 +72,14 @@ export default new Vuex.Store({
     },
     actions: {
         checkAuth({ commit }) {
-            fetch(`${process.env.API_URI_V1}/auth/check`, {
+            return fetch(`${process.env.API_URI_V1}/auth/check`, {
                 credentials: "include",
             })
                 .then((response) => {
                     if(response.ok) {
                         response.json()
                             .then((data) => {
-                                commit("FETCH_AUTH", data.message);
+                                commit("FETCH_AUTH", data.data);
                             });
                     }
                 })
@@ -76,35 +88,27 @@ export default new Vuex.Store({
                 });
         },
         getVersion({ commit }) {
-            fetch(`${process.env.API_URI_V1}/utilities/version`, {
+            return fetch(`${process.env.API_URI_V1}/utilities/version`, {
                 credentials: "include",
             })
                 .then((response) => {
-                    response.json()
-                        .then((data) => {
-                            commit("FETCH_VERSION", data.message);
-                        });
+                    if(response.ok) {
+                        response.json()
+                            .then((data) => {
+                                commit("FETCH_VERSION", data.message);
+                            });
+                    } else {
+                        if(response.status === 409) {
+                            commit("NO_AUTH");
+                        }
+                    }
                 })
                 .catch((error) => {
-                    console.error(error);
-                    commit("FETCH_VERSION", {
-                        version: "Unknown",
-                        branch: "Unknown"
-                    });
+                    console.error("error", error);
                 });
-        },
-        getUploads({ commit }, { self }) {
-            fetch(`${process.env.API_URI_V1}/utilities/uploads`)
-                .then((response) => {
-                    console.log(response);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-
         },
         getViews({ commit }, { self }) {
-            fetch(`${process.env.API_URI_V1}/utilities/views`)
+            return fetch(`${process.env.API_URI_V1}/utilities/views`)
                 .then((response) => {
                     console.log(response);
                 })
@@ -113,7 +117,7 @@ export default new Vuex.Store({
                 });
 
         },
-        getUserFiles({ commit }) {
+        getFiles({ commit }) {
             let examples = [];
             for (let i = 0; i < 50; i++) {
                 let id = uuid();

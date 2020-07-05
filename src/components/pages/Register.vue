@@ -14,8 +14,8 @@ export default {
         RegistrationForm
     },
     created() {
-        if (this.$store.state.user.loggedIn) {
-            this.$router.push("dashnoard");
+        if (this.$store.getters.loggedIn) {
+            this.$router.push("dashboard");
         }
     }
 };

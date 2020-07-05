@@ -43,11 +43,6 @@ export default {
             loading: false
         };
     },
-    create() {
-        if (this.$store.getters.loggedIn) {
-            this.$router.push("dashboard");
-        }
-    },
     watch: {
         loader() {
             let l = this.loader;
@@ -64,7 +59,7 @@ export default {
             let response = fetch(`${process.env.API_URI_V1}/auth/login`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     username: this.username,
@@ -76,19 +71,18 @@ export default {
                 .then(r => {
                     if (r.ok) {
                         r.json()
-                            .then((json) => {
+                            .then(json => {
                                 console.log(json);
                                 this.$store.state.user.loggedIn = true;
                                 this.$store.state.user.id = json.data.id;
-                                this.$store.state.user.username = json.data.username;
+                                this.$store.state.user.username =
+                                    json.data.username;
                                 this.$store.state.user.email = json.data.email;
                                 this.$router.push("dashboard");
-
                             })
-                            .catch((error) => {
+                            .catch(error => {
                                 console.error(error);
-                            })
-
+                            });
                     } else {
                         console.error(`Login failed: ${r.statusText}`);
                     }

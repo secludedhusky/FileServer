@@ -10,7 +10,7 @@
                             <v-avatar size="64" class="mr-4">
                                 <img :src="'https://via.placeholder.com/150'" alt="Avatar" />
                             </v-avatar>
-                            Welcome, {{ this.$store.state.user.username }}
+                            Welcome, {{ this.$store.getters.getUsername }}
                         </v-flex>
                     </v-card-text>
                 </v-card>
@@ -25,11 +25,8 @@ import FileList from "../lists/FileList.vue";
 
 export default {
     name: "dashboard",
-    components: { FileList },
-    created() {
-        if (!this.$store.state.user.loggedIn) {
-            this.$router.push("login");
-        }
+    components: {
+        FileList
     }
 };
 </script>

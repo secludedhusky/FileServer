@@ -1,5 +1,5 @@
 <template>
-    <v-app>
+    <v-app v-if="dataReady">
         <div id="app">
             <v-app id="inspire">
                 <v-app id="inspire">
@@ -44,11 +44,12 @@
 </template>
 
 <script>
+import 'babel-polyfill';
+
 import store from "../../store";
 
 export default {
     name: "app-main",
-
     computed: {
         links() {
             return this.items.filter(item => {
@@ -59,7 +60,7 @@ export default {
     data: () => ({
         copy: "XenPowered",
         drawer: true,
-        loggedIn: false,
+        dataReady: false,
         items: [
             {
                 path: "/dashboard",
@@ -92,13 +93,14 @@ export default {
             if (this.$router.history.current.name !== page) {
                 this.$router.push(page);
             }
-        }
+        },
+        async checkLogin() {}
     },
-    created() {
+    async created() {
+        console.log("App dispatch");
+        
         this.$store.dispatch("checkAuth");
-    },
-    mounted() {
-        console.log(this.$store.getters.loggedIn);
+        this.dataReady = true;
     }
 };
 </script>

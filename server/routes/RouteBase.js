@@ -5,23 +5,17 @@ const LocalStrategy = require('passport-local').Strategy;
 const DatabaseManager = require("../lib/database-manager");
 
 class RouteBase {
-    
+
     constructor() {
         // Database
         this.database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
-        
+
         // Passport
         this.passport = passport;
 
         this.passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async (u, p, d) => { await this.loginStrategy(u, p, d) }));
-        this.passport.serializeUser(function (user, done) {
-            console.log("Serialise", user);
-            done(null, user);
-        });
-        this.passport.deserializeUser(function (user, done) {
-            console.log("User is authenticated:", user.username);
-            done(null, user);
-        });
+        this.passport.serializeUser(function (user, done) { done(null, user); });
+        this.passport.deserializeUser(function (user, done) { done(null, user); });
     }
 
     async loginStrategy(username, password, done) {
@@ -46,14 +40,6 @@ class RouteBase {
         }
     }
 
-    notImplemented(req, res) {
-        res.set({ "Content-Type": "application/json" }).status(501)
-            .send({
-                status: 501,
-                message: `Not implemented.`
-            });
-    }
-
     isAuthenticated(req, res, next) {
         if (req.user) {
             return next();
@@ -63,6 +49,14 @@ class RouteBase {
                 message: "Not logged in."
             });
         }
+    }
+
+    notImplemented(req, res) {
+        res.set({ "Content-Type": "application/json" }).status(501)
+            .send({
+                status: 501,
+                message: `Not implemented.`
+            });
     }
 
     GetRoutes() {

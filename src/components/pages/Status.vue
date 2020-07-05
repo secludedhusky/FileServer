@@ -10,18 +10,13 @@
 <script>
 export default {
     name: "status",
-    methods: {
-        navigate(page) {
-            if (this.$router.history.current.name !== page) {
-                this.$router.push(page);
-            }
-        }
-    },
-    created: function() {
-        if (!this.$store.getters.loggedIn) {
-            this.$router.push("login");
-        }
+    async created() {
+        console.log("Status dispatch");
+
+        await this.$store.dispatch("checkAuth");
+
         
+
         this.$store.dispatch("getVersion", { self: this });
     }
 };

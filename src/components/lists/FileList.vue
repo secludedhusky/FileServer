@@ -23,7 +23,7 @@ export default {
         };
     },
     created() {
-        this.$store.dispatch("getUserFiles");
+        this.$store.dispatch("getFiles");
     },
     methods: {
         downloadFile(id) {
