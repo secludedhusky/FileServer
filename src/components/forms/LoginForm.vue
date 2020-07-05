@@ -1,6 +1,12 @@
 <template>
     <v-form>
         <v-container>
+            <v-row v-if="error">
+                <v-col cols="12" sm="12">
+                    <v-alert type="error">{{ error }}</v-alert>
+                </v-col>
+            </v-row>
+
             <v-row>
                 <v-col cols="12" sm="6">
                     <v-text-field v-model="username" label="Username" type="text" filled></v-text-field>
@@ -39,8 +45,11 @@ export default {
         return {
             username: null,
             password: null,
+
             loader: null,
-            loading: false
+            loading: false,
+
+            error: ""
         };
     },
     watch: {
@@ -53,43 +62,26 @@ export default {
     },
     methods: {
         login() {
-            const l = this.loader;
-            this[l] = true;
+            this.error = "";
 
-            let response = fetch(`${process.env.API_URI_V1}/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            this.$store
+                .dispatch("login", {
+                    self: this,
                     username: this.username,
                     password: this.password
                 })
-            });
-
-            response
-                .then(r => {
-                    if (r.ok) {
-                        r.json()
-                            .then(json => {
-                                console.log(json);
-                                this.$store.state.user.loggedIn = true;
-                                this.$store.state.user.id = json.data.id;
-                                this.$store.state.user.username =
-                                    json.data.username;
-                                this.$store.state.user.email = json.data.email;
-                                this.$router.push("dashboard");
-                            })
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    } else {
-                        console.error(`Login failed: ${r.statusText}`);
+                .then(response => {
+                    if (response.status != 201) {
+                        this.error = `${response.status} - ${response.statusText}`;
                     }
                     setTimeout(() => (this.loading = false), 1000);
                 })
                 .catch(error => {
-                    console.error(error);
+                    if (error.status === 401) {
+                        this.error = `Your login details are incorrect, please try again.`;
+                    } else {
+                        this.error = `${response.status} - ${response.statusText}`;
+                    }
                     setTimeout(() => (this.loading = false), 1000);
                 });
         }
@@ -98,6 +90,22 @@ export default {
 </script>
 
 <style>
+/* Change autocomplete styles in WebKit */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    border: none;
+    -webkit-text-fill-color: #ffffff;
+    -webkit-box-shadow: none;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 .custom-loader {
     animation: loader 1s infinite;
     display: flex;
