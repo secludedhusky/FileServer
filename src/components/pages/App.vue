@@ -92,7 +92,7 @@ export default {
             if (this.$router.history.current.name !== page) {
                 this.$router.push(page);
             }
-        },
+        }
     },
     created() {
         this.$store.dispatch("checkAuth", this);

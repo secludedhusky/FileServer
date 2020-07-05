@@ -31,7 +31,7 @@ export default {
         },
         deleteFile(id) {
             console.log("Delete", id);
-        },
+        }
     }
 };
 </script>

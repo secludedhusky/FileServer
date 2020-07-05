@@ -30,7 +30,7 @@ export default {
     },
     created: function() {
         this.$nextTick(function() {
-            if(!this.$store.getters.loggedIn){
+            if (!this.$store.getters.loggedIn) {
                 this.$router.push("login");
             }
         });
