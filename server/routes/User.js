@@ -30,7 +30,13 @@ class User extends RouteBase {
         }
 
         let files = await database.select({
-            columns: `${process.env.UPLOAD_TABLE_V1}.id, ${process.env.UPLOAD_TABLE_V1}.upload_filename, ${process.env.UPLOAD_TABLE_V1}.upload_date, ${process.env.UPLOAD_TABLE_V1}.upload_mime, COUNT(${process.env.VIEW_TABLE_V1}.view_id) as upload_views`,
+            columns: `
+                ${process.env.UPLOAD_TABLE_V1}.id, 
+                ${process.env.UPLOAD_TABLE_V1}.upload_filename, 
+                ${process.env.UPLOAD_TABLE_V1}.upload_date, 
+                ${process.env.UPLOAD_TABLE_V1}.upload_mime, 
+                ${process.env.UPLOAD_TABLE_V1}.upload_url, 
+                COUNT(${process.env.VIEW_TABLE_V1}.view_id) as upload_views`,
             from: process.env.UPLOAD_TABLE_V1,
             where: { upload_user: req.user.id, ...options },
             join: {

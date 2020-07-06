@@ -23,6 +23,21 @@
             :items="this.$store.getters.myFiles"
             class="elevation-1"
         >
+            <template v-slot:item.upload_filename="{ item }">
+                <span>
+                    {{ item.upload_filename }}
+                    <v-btn
+                        color="secondary"
+                        fab
+                        x-small
+                        dark
+                        :href="item.upload_url"
+                        target="_BLANK"
+                    >
+                        <v-icon>mdi-open-in-new</v-icon>
+                    </v-btn>
+                </span>
+            </template>
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
