@@ -17,6 +17,13 @@
                 </template>
             </v-btn>
         </v-subheader>
+
+        <v-row v-if="error">
+            <v-col cols="12" sm="12">
+                <v-alert type="error">{{ error }}</v-alert>
+            </v-col>
+        </v-row>
+
         <v-data-table
             loading-text="Loading..."
             :headers="headers"
@@ -61,7 +68,8 @@ export default {
                 { text: "Actions", value: "actions", sortable: false }
             ],
             loader: null,
-            loading: false
+            loading: false,
+            error: ""
         };
     },
     created() {
@@ -83,9 +91,17 @@ export default {
             console.log("Delete", id);
         },
         getFiles() {
-            this.$store.dispatch("getFiles", this).then(() => {
-                setTimeout(() => (this.loading = false), 1000);
-            });
+            this.error = "";
+
+            this.$store
+                .dispatch("getFiles", this)
+                .then(() => {
+                    setTimeout(() => (this.loading = false), 1000);
+                })
+                .catch(() => {
+                    this.error = "Failed to get files, please try again later.";
+                    setTimeout(() => (this.loading = false), 1000);
+                });
         }
     }
 };

@@ -95,7 +95,10 @@ export default new Vuex.Store({
                         username: payload.username,
                         password: payload.password
                     })
-                });
+                })
+                    .catch((error) => {
+                        reject(response);
+                    })
 
                 if (response.ok) {
                     let data = await response.json()
@@ -106,7 +109,7 @@ export default new Vuex.Store({
                     commit("login", payload);
                     resolve(data);
                 } else {
-                    reject(response);
+                    resolve(response);
                 }
 
             });
@@ -208,15 +211,19 @@ export default new Vuex.Store({
         },
 
         getFiles({ commit }, self) {
-            return fetch(`${process.env.API_URI_V1}/user/files`)
-                .then((r) => {
-                    switch (r.status) {
-                        case 200:
-                            r.json()
-                                .then((data) => {
-                                    commit("getFiles", data.data);
-                                });
-                            break;
+            return new Promise(async (resolve, reject) => {
+                let response = await fetch(`${process.env.API_URI_V1}/user/files`)
+
+                if (response.ok) {
+                    let data = await response.json()
+                        .catch(error => {
+                            console.error(error);
+                        });
+
+                    commit("getFiles", data.data);
+                    resolve(data);
+                } else {
+                    switch (response.status) {
                         case 401:
                             commit("noAuth", self);
                             break;
@@ -224,10 +231,9 @@ export default new Vuex.Store({
                             console.error("Unknown status");
                             break;
                     }
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
+                    reject(response);
+                }
+            });
         },
 
         logout({ commit }, self) {
