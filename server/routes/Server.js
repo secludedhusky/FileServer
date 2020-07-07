@@ -61,7 +61,7 @@ class Server extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
-            router.get("/stats", this.isAuthenticated, this.getStats);
+            router.get("/stats", this.getStats);
 
             return router;
         })();

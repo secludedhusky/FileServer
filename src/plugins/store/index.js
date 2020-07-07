@@ -34,6 +34,9 @@ export default new Vuex.Store({
         myFiles: state => {
             return state.user.files;
         },
+        getStats: state => {
+            return [state.app];
+        }
     },
     mutations: {
         login(state, data) {
