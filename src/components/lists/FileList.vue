@@ -16,10 +16,7 @@
                     </span>
                 </template>
             </v-btn>
-            <v-btn
-                icon
-                color="green"
-            >
+            <v-btn icon color="green">
                 <v-icon>mdi-upload</v-icon>
             </v-btn>
         </v-subheader>
