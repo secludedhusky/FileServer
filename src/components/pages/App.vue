@@ -74,6 +74,12 @@ export default {
                 authRequired: true
             },
             {
+                path: "/home",
+                title: "Home",
+                icon: "mdi-login",
+                authRequired: false
+            },
+            {
                 path: "/login",
                 title: "Login",
                 icon: "mdi-login",
