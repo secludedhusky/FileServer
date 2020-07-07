@@ -1,20 +1,16 @@
 <template>
     <v-container>
-        <h1>Home</h1>
-        <home-form></home-form>
+        <h1>Statistics</h1>
         <stats-list></stats-list>
     </v-container>
 </template>
 
 <script>
 import StatsList from "../lists/StatsList.vue";
-import HomeForm from "../forms/HomeForm.vue";
-
 export default {
-    name: "home",
+    name: "statistics",
     components: {
-        HomeForm,
         StatsList
     }
 };
-</script>
+</script> 

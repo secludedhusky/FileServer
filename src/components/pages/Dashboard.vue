@@ -13,6 +13,11 @@
                             Welcome, {{ this.$store.getters.getUsername }}
                         </v-flex>
                     </v-card-text>
+                    <v-card-actions>
+                        <v-btn text>Security</v-btn>
+                        <v-btn text>Privacy</v-btn>
+                        <v-btn text color="error">Logout</v-btn>
+                    </v-card-actions>
                 </v-card>
             </v-layout>
         </v-container>

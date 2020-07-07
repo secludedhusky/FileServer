@@ -68,15 +68,15 @@ export default {
                 authRequired: true
             },
             {
-                path: "/status",
-                title: "Status",
+                path: "/stats",
+                title: "Statistics",
                 icon: "mdi-server",
                 authRequired: true
             },
             {
                 path: "/home",
                 title: "Home",
-                icon: "mdi-login",
+                icon: "mdi-home",
                 authRequired: false
             },
             {

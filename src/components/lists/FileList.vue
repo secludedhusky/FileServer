@@ -16,6 +16,12 @@
                     </span>
                 </template>
             </v-btn>
+            <v-btn
+                icon
+                color="green"
+            >
+                <v-icon>mdi-upload</v-icon>
+            </v-btn>
         </v-subheader>
 
         <v-row v-if="error">
@@ -50,7 +56,7 @@
             </template>
             <template v-slot:item.actions="{ item }">
                 <v-icon small class="mr-2" @click="downloadFile(item.id)">mdi-download</v-icon>
-                <v-icon small @click="deleteFile(item.id)">mdi-delete</v-icon>
+                <v-icon color="red" small @click="deleteFile(item.id)">mdi-delete</v-icon>
             </template>
         </v-data-table>
     </v-container>

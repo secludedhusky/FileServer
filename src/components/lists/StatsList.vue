@@ -1,5 +1,11 @@
 <template>
     <v-container>
+        <v-row v-if="error">
+            <v-col cols="12" sm="12">
+                <v-alert type="error">{{ error }}</v-alert>
+            </v-col>
+        </v-row>
+
         <v-subheader>
             Server Statistics
             <v-btn
@@ -18,11 +24,6 @@
             </v-btn>
         </v-subheader>
 
-        <v-row v-if="error">
-            <v-col cols="12" sm="12">
-                <v-alert type="error">{{ error }}</v-alert>
-            </v-col>
-        </v-row>
 
         <v-data-table
             loading-text="Loading..."
@@ -36,7 +37,7 @@
 
 <script>
 export default {
-    name: "status-list",
+    name: "stats-list",
     data() {
         return {
             headers: [
@@ -78,42 +79,3 @@ export default {
     }
 };
 </script>
-
-<style>
-.custom-loader {
-    animation: loader 1s infinite;
-    display: flex;
-}
-@-moz-keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
-@-webkit-keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
-@-o-keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
-@keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
-</style>
