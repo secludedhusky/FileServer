@@ -14,7 +14,7 @@
                 <v-card-actions>
                     <v-btn text>Security</v-btn>
                     <v-btn text>Privacy</v-btn>
-                    <v-btn text color="error">Logout</v-btn>
+                    <v-btn text color="error" @click="logout()">Logout</v-btn>
                 </v-card-actions>
             </v-card>
         </v-layout>
@@ -25,6 +25,11 @@
 import FileList from "../lists/FileList.vue";
 
 export default {
-    name: "user-profile"
+    name: "user-profile",
+    methods: {
+        logout() {
+            this.$router.push('logout');
+        }
+    }
 };
 </script>
