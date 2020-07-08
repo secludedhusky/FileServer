@@ -1,37 +1,38 @@
 <template>
     <v-container>
-        <v-row v-if="error">
-            <v-col cols="12" sm="12">
-                <v-alert type="error">{{ error }}</v-alert>
-            </v-col>
-        </v-row>
+        <v-layout column>
+            <v-row v-if="error">
+                <v-col cols="12" sm="12">
+                    <v-alert type="error">{{ error }}</v-alert>
+                </v-col>
+            </v-row>
 
-        <v-subheader>
-            Server Statistics
-            <v-btn
-                :loading="loading"
-                :disabled="loading"
-                icon
-                color="green"
-                @click="loader = 'loading'; getStats()"
-            >
-                <v-icon>mdi-cached</v-icon>
-                <template v-slot:loader>
-                    <span class="custom-loader">
-                        <v-icon light>cached</v-icon>
-                    </span>
-                </template>
-            </v-btn>
-        </v-subheader>
+            <v-subheader>
+                Server Statistics
+                <v-btn
+                    :loading="loading"
+                    :disabled="loading"
+                    icon
+                    color="green"
+                    @click="loader = 'loading'; getStats()"
+                >
+                    <v-icon>mdi-cached</v-icon>
+                    <template v-slot:loader>
+                        <span class="custom-loader">
+                            <v-icon light>cached</v-icon>
+                        </span>
+                    </template>
+                </v-btn>
+            </v-subheader>
 
-
-        <v-data-table
-            loading-text="Loading..."
-            :headers="headers"
-            :items="this.$store.getters.getStats"
-            :hide-default-footer="true"
-            class="elevation-1"
-        ></v-data-table>
+            <v-data-table
+                loading-text="Loading..."
+                :headers="headers"
+                :items="this.$store.getters.getStats"
+                :hide-default-footer="true"
+                class="elevation-1"
+            ></v-data-table>
+        </v-layout>
     </v-container>
 </template>
 
