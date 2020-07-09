@@ -9,16 +9,16 @@ export default new Vuex.Store({
     state: {
         user: {
             loggedIn: false,
-            id: "",
-            username: "",
-            email: "",
+            id: null,
+            username: null,
+            email: null,
             files: []
         },
         app: {
-            version: "",
-            branch: "",
-            uploads: "",
-            views: "",
+            version: null,
+            branch: null,
+            uploads: null,
+            views: null,
         }
     },
     getters: {
@@ -35,8 +35,7 @@ export default new Vuex.Store({
             return state.user.files;
         },
         getStats: state => {
-            console.log(state);
-            return (state.app.version && state.app.branch && state.app.uploads && state.app.views ? [state.app] : []);
+            return [state.app];
         }
     },
     mutations: {
@@ -67,20 +66,27 @@ export default new Vuex.Store({
         noAuth(state, self) {
             state.user = {
                 loggedIn: false,
-                id: "",
-                username: "",
-                email: "",
+                id: null,
+                username: null,
+                email: null,
                 files: [],
             }
 
-            if (self.$router.history.current.name !== "login") {
+            if (self.$router.history.current.name !== "login" && self.$router.history.current.name !== "home") {
                 self.$router.push("login");
             }
         },
 
         getStats(state, data) {
-            if(data) {
+            if (data) {
                 state.app = data;
+            } else {
+                state.app = {
+                    version: null,
+                    branch: null,
+                    uploads: null,
+                    views: null,
+                }
             }
         },
 
@@ -193,7 +199,7 @@ export default new Vuex.Store({
                 });
         },
         getStats({ commit }, self) {
-            return new Promise ((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 return fetch(`${process.env.API_URI_V1}/server/stats`)
                     .then((r) => {
                         switch (r.status) {

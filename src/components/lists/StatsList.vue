@@ -29,7 +29,7 @@
                 loading-text="Please wait..."
                 :loading="loading"
                 :headers="headers"
-                :items="stats"
+                :items="this.$store.getters.getStats"
                 :hide-default-footer="true"
                 class="elevation-1"
             ></v-data-table>
@@ -50,8 +50,7 @@ export default {
             ],
             loader: null,
             loading: true,
-            error: "",
-            stats: []
+            error: ""
         };
     },
     created() {
