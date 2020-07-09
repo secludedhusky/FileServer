@@ -1,12 +1,6 @@
 <template>
     <v-container>
         <v-layout column>
-            <v-row v-if="error">
-                <v-col cols="12" sm="12">
-                    <v-alert type="error">{{ error }}</v-alert>
-                </v-col>
-            </v-row>
-
             <v-subheader>
                 Server Statistics
                 <v-btn
@@ -25,10 +19,17 @@
                 </v-btn>
             </v-subheader>
 
+            <v-row v-if="error">
+                <v-col cols="12" sm="12">
+                    <v-alert dismissible type="error">{{ error }}</v-alert>
+                </v-col>
+            </v-row>
+
             <v-data-table
-                loading-text="Loading..."
+                loading-text="Please wait..."
+                :loading="loading"
                 :headers="headers"
-                :items="this.$store.getters.getStats"
+                :items="stats"
                 :hide-default-footer="true"
                 class="elevation-1"
             ></v-data-table>
@@ -48,12 +49,13 @@ export default {
                 { text: "Version", value: "version", sortable: false }
             ],
             loader: null,
-            loading: false,
-            error: ""
+            loading: true,
+            error: "",
+            stats: []
         };
     },
     created() {
-        this.$store.dispatch("getStats", this);
+        this.getStats();
     },
     watch: {
         loader() {
@@ -69,10 +71,10 @@ export default {
 
             this.$store
                 .dispatch("getStats", this)
-                .then(() => {
+                .then(r => {
                     setTimeout(() => (this.loading = false), 1000);
                 })
-                .catch(() => {
+                .catch(e => {
                     this.error = "Failed to get stats, please try again later.";
                     setTimeout(() => (this.loading = false), 1000);
                 });

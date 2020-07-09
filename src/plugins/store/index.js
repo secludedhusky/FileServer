@@ -35,7 +35,8 @@ export default new Vuex.Store({
             return state.user.files;
         },
         getStats: state => {
-            return [state.app];
+            console.log(state);
+            return (state.app.version && state.app.branch && state.app.uploads && state.app.views ? [state.app] : []);
         }
     },
     mutations: {
@@ -78,7 +79,9 @@ export default new Vuex.Store({
         },
 
         getStats(state, data) {
-            state.app = data;
+            if(data) {
+                state.app = data;
+            }
         },
 
         getFiles(state, data) {
@@ -190,26 +193,32 @@ export default new Vuex.Store({
                 });
         },
         getStats({ commit }, self) {
-            return fetch(`${process.env.API_URI_V1}/server/stats`)
-                .then((r) => {
-                    switch (r.status) {
-                        case 200:
-                            r.json()
-                                .then((data) => {
-                                    commit("getStats", data.data);
-                                });
-                            break;
-                        case 401:
-                            commit("noAuth", self);
-                            break;
-                        default:
-                            console.error("Unknown status");
-                            break;
-                    }
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
+            return new Promise ((resolve, reject) => {
+                return fetch(`${process.env.API_URI_V1}/server/stats`)
+                    .then((r) => {
+                        switch (r.status) {
+                            case 200:
+                                resolve(r);
+                                r.json()
+                                    .then((data) => {
+                                        commit("getStats", data.data);
+                                    });
+                                break;
+                            case 401:
+                                reject(r);
+                                commit("noAuth", self);
+                                break;
+                            default:
+                                reject(r);
+                                commit("getStats", null);
+                                console.error("Unknown status");
+                                break;
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            })
 
         },
 

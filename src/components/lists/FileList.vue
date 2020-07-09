@@ -19,19 +19,31 @@
             <v-btn icon color="green">
                 <v-icon>mdi-upload</v-icon>
             </v-btn>
+            <v-btn @click="downloadMultiple()" v-if="selected.length > 0" icon color="green">
+                <v-icon>mdi-download</v-icon>
+            </v-btn>
+            <v-btn @click="editMultiple()" v-if="selected.length > 0" icon color="green">
+                <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn @click="deleteMultiple()" v-if="selected.length > 0" icon color="red">
+                <v-icon>mdi-delete</v-icon>
+            </v-btn>
         </v-subheader>
 
         <v-row v-if="error">
             <v-col cols="12" sm="12">
-                <v-alert type="error">{{ error }}</v-alert>
+                <v-alert dismissible type="error">{{ error }}</v-alert>
             </v-col>
         </v-row>
 
         <v-data-table
-            loading-text="Loading..."
+            loading-text="Please wait..."
+            :loading="loading"
+            v-model="selected"
             :headers="headers"
             :items="this.$store.getters.myFiles"
             class="elevation-1"
+            show-select
         >
             <template v-slot:item.upload_filename="{ item }">
                 <span>
@@ -52,8 +64,9 @@
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon small class="mr-2" @click="downloadFile(item.id)">mdi-download</v-icon>
-                <v-icon color="red" small @click="deleteFile(item.id)">mdi-delete</v-icon>
+                <v-icon small class="mr-2" @click="downloadFile(item)">mdi-download</v-icon>
+                <v-icon small class="mr-2" @click="editFile(item)">mdi-pencil</v-icon>
+                <v-icon small color="red" @click="deleteFile(item)">mdi-delete</v-icon>
             </template>
         </v-data-table>
     </v-container>
@@ -71,12 +84,13 @@ export default {
                 { text: "Actions", value: "actions", sortable: false }
             ],
             loader: null,
-            loading: false,
-            error: ""
+            loading: true,
+            error: "",
+            selected: []
         };
     },
     created() {
-        this.$store.dispatch("getFiles", this);
+        this.getFiles();
     },
     watch: {
         loader() {
@@ -93,6 +107,20 @@ export default {
         deleteFile(id) {
             console.log("Delete", id);
         },
+        editFile(id) {
+            console.log("Edit", id);
+        },
+
+        downloadMultiple() {
+            console.log("Download", this.selected);
+        },
+        deleteMultiple() {
+            console.log("Delete", this.selected);
+        },
+        editMultiple() {
+            console.log("Edit", this.selected);
+        },
+
         getFiles() {
             this.error = "";
 
