@@ -28,7 +28,7 @@ class DatabaseManager {
 
     /**
      * Get Connection
-     * Returns connection from the database pool.
+     * Returns connection from the connection pool.
      */
     async getConnection() {
         return new Promise((resolve, reject) => {
@@ -56,7 +56,6 @@ class DatabaseManager {
      *      -- WHERE (condition AND condition) or (cond AND cond)
      *      -- WHERE condition OR condition
      */
-
     async select(options) {
         let columns = options.columns,
             table = options.from,
@@ -130,7 +129,6 @@ class DatabaseManager {
             }
         });
     }
-
 
     /**
      * Updates data in a table

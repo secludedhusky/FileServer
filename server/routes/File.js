@@ -61,17 +61,13 @@ class FileGet extends RouteBase {
 
                         stream.on('error', (error) => {
                             console.log(error);
-                            res.status(500)
-                                .send({
-                                    status: 500,
-                                    message: `Internal server error`
-                                });
+                            res.status(500).send({
+                                status: 500,
+                                message: `Internal server error`
+                            });
                         })
 
                         stream.on('close', function () {
-
-                            console.log("Uploaded: ", filename);
-
                             database.insert(process.env.UPLOAD_TABLE_V1, {
                                 id: requestId,
                                 upload_path: filePath,
@@ -82,21 +78,19 @@ class FileGet extends RouteBase {
                                 upload_date: moment(new Date()).format("YYYY-MM-DD HH:mm:ss")
                             })
                                 .then((r) => {
-                                    res.status(200)
-                                        .send({
-                                            status: 200,
-                                            data: {
-                                                link: uploadUrl
-                                            }
-                                        });
+                                    res.status(200).send({
+                                        status: 200,
+                                        data: {
+                                            link: uploadUrl
+                                        }
+                                    });
                                 })
                                 .catch((error) => {
                                     console.log(error);
-                                    res.status(500)
-                                        .send({
-                                            status: 500,
-                                            message: error.message
-                                        });
+                                    res.status(500).send({
+                                        status: 500,
+                                        message: error.message
+                                    });
                                 });
 
                             database.increment(process.env.TOKEN_TABLE_V1, "token_usage", { token_value: incomingToken })
@@ -106,28 +100,23 @@ class FileGet extends RouteBase {
                         });
                     } catch (error) {
                         console.log(error);
-                        res.status(500)
-                            .send({
-                                status: 500,
-                                message: error.message
-                            });
+                        res.status(500).send({
+                            status: 500,
+                            message: error.message
+                        });
                     }
                 });
             } else {
-                console.log(`Token has been revoked.`);
-                res.status(401)
-                    .send({
-                        status: 401,
-                        message: `Token has been revoked.`
-                    });
+                res.status(401).send({
+                    status: 401,
+                    message: `Token has been revoked.`
+                });
             }
         } else {
-            console.log(`Invalid token provided: ${req.headers.authorization}`);
-            res.status(401)
-                .send({
-                    status: 401,
-                    message: `Invalid token provided.`
-                });
+            res.status(401).send({
+                status: 401,
+                message: `Invalid token provided.`
+            });
         }
     }
 

@@ -7,12 +7,9 @@ const DatabaseManager = require("../lib/database-manager");
 class RouteBase {
 
     constructor() {
-        // Database
         this.database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
-        // Passport
         this.passport = passport;
-
         this.passport.use(new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async (u, p, d) => {
             await this.loginStrategy(u, p, d)
                 .catch((error) => {

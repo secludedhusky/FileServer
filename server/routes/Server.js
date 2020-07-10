@@ -12,7 +12,6 @@ class Server extends RouteBase {
     }
 
     async getStats(req, res) {
-        let errors = []
         let fileCount = await database.select({
             columns: "COUNT(id) as files",
             from: process.env.UPLOAD_TABLE_V1,
@@ -22,7 +21,6 @@ class Server extends RouteBase {
         })
             .catch((error) => {
                 console.error(error);
-                error.push(error);
             });
 
         let viewCount = await database.select({
@@ -34,7 +32,6 @@ class Server extends RouteBase {
         })
             .catch((error) => {
                 console.error(error);
-                error.push(error);
             });
 
         if (errors.length === 0) {
@@ -50,9 +47,7 @@ class Server extends RouteBase {
         } else {
             res.status(500).send({
                 status: 500,
-                message: {
-                    errors: errors
-                }
+                message: "Internal server error"
             });
         }
     }
