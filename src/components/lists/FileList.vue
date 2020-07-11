@@ -138,41 +138,6 @@ export default {
 };
 </script>
 
-<style>
-.custom-loader {
-    animation: loader 1s infinite;
-    display: flex;
-}
-@-moz-keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
-@-webkit-keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
-@-o-keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
-@keyframes loader {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0);
-    }
-}
+<style lang="scss">
+@import "../styles/_loader.scss";
 </style>

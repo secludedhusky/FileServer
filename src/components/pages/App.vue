@@ -112,3 +112,7 @@ export default {
     }
 };
 </script>
+
+<style lang="scss">
+@import "../styles/_animation.scss";
+</style>

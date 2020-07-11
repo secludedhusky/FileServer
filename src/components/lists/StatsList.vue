@@ -81,3 +81,7 @@ export default {
     }
 };
 </script>
+
+<style lang="scss">
+@import "../styles/_loader.scss";
+</style>
