@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-
-import uuid from "uuid/dist/v4";
+import { resolve } from "../../../webpack.config";
 
 Vue.use(Vuex);
 
@@ -263,5 +262,12 @@ export default new Vuex.Store({
                     console.error(error);
                 });
         },
+
+        fileOperation({ commit }, payload) {
+            return new Promise((resolve, reject) => {
+                resolve(true);
+            })
+        },
+
     }
 });

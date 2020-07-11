@@ -19,13 +19,13 @@
             <v-btn icon color="green">
                 <v-icon>mdi-upload</v-icon>
             </v-btn>
-            <v-btn @click="downloadMultiple()" v-if="selected.length > 0" icon color="green">
+            <v-btn @click="fileOperation('download')" v-if="selected.length > 0" icon color="green">
                 <v-icon>mdi-download</v-icon>
             </v-btn>
-            <v-btn @click="editMultiple()" v-if="selected.length > 0" icon color="green">
+            <v-btn @click="fileOperation('edit')" v-if="selected.length > 0" icon color="green">
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-btn @click="deleteMultiple()" v-if="selected.length > 0" icon color="red">
+            <v-btn @click="fileOperation('delete')" v-if="selected.length > 0" icon color="red">
                 <v-icon>mdi-delete</v-icon>
             </v-btn>
         </v-subheader>
@@ -64,9 +64,9 @@
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon small class="mr-2" @click="downloadFile(item)">mdi-download</v-icon>
-                <v-icon small class="mr-2" @click="editFile(item)">mdi-pencil</v-icon>
-                <v-icon small color="red" @click="deleteFile(item)">mdi-delete</v-icon>
+                <v-icon small class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
+                <v-icon small class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
+                <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
         </v-data-table>
     </v-container>
@@ -86,7 +86,8 @@ export default {
             loader: null,
             loading: true,
             error: "",
-            selected: []
+            selected: [],
+            modes: ["download", "edit", "delete"]
         };
     },
     created() {
@@ -101,24 +102,40 @@ export default {
         }
     },
     methods: {
-        downloadFile(id) {
-            console.log("Download", id);
-        },
-        deleteFile(id) {
-            console.log("Delete", id);
-        },
-        editFile(id) {
-            console.log("Edit", id);
-        },
+        getIdsFromObject(data) {
+            let items = [];
 
-        downloadMultiple() {
-            console.log("Download", this.selected);
+            if (Array.isArray(data)) {
+                items = data.map(item => {
+                    return item.id;
+                });
+            } else {
+                items.push(data.id);
+            }
+
+            return items;
         },
-        deleteMultiple() {
-            console.log("Delete", this.selected);
-        },
-        editMultiple() {
-            console.log("Edit", this.selected);
+        fileOperation(mode, data) {
+            if (this.modes.includes(mode)) {
+                if (!data) {
+                    data = this.selected;
+                }
+
+                this.$store
+                    .dispatch("fileOperation", {
+                        mode: mode,
+                        data: this.getIdsFromObject(data),
+                        self: this
+                    })
+                    .then(r => {
+                        console.log(r);
+                    })
+                    .catch(error => {
+                        this.error =
+                            "Failed to get files, please try again later.";
+                        setTimeout(() => (this.loading = false), 1000);
+                    });
+            }
         },
 
         getFiles() {
