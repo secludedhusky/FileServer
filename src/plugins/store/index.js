@@ -1,6 +1,5 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { resolve } from "../../../webpack.config";
 
 Vue.use(Vuex);
 
