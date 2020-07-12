@@ -113,7 +113,7 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                let q = connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement}`, tableParams, function (error, results, fields) {
+                connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement}`, tableParams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }

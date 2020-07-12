@@ -16,9 +16,6 @@
                     </span>
                 </template>
             </v-btn>
-            <v-btn icon color="green">
-                <v-icon>mdi-upload</v-icon>
-            </v-btn>
             <v-btn @click="fileOperation('download')" v-if="selected.length > 0" icon color="green">
                 <v-icon>mdi-download</v-icon>
             </v-btn>
