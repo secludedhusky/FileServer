@@ -137,7 +137,6 @@ class FileGet extends RouteBase {
                             let total = stats.size;
 
                             if (req.headers.range) {
-                                console.log("Rewrite range");
                                 var range = req.headers.range;
                                 var parts = range.replace(/bytes=/, "").split("-");
                                 var partialStart = parts[0];

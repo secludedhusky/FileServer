@@ -42,10 +42,7 @@
             class="elevation-1"
             show-select
         >
-            <template
-                v-show="$vuetify.breakpoint.mdAndDown"
-                v-slot:item.upload_date="{ item }"
-            >
+            <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
