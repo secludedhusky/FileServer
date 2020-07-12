@@ -45,21 +45,6 @@
             class="elevation-1"
             show-select
         >
-            <!-- <template v-slot:item.upload_filename="{ item }">
-                <span>
-                    {{ item.upload_filename }}
-                    <v-btn
-                        color="secondary"
-                        fab
-                        x-small
-                        dark
-                        :href="item.upload_url"
-                        target="_BLANK"
-                    >
-                        <v-icon>mdi-eye</v-icon>
-                    </v-btn>
-                </span>
-            </template>-->
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
@@ -69,31 +54,23 @@
                 <v-icon small class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
                 <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
-            <!-- <template v-slot:expanded-item="{ headers, item }">
-                <td :colspan="headers.length">More info about {{ item.name }}</td>
-            </template>-->
         </v-data-table>
 
         <template>
             <div class="text-center">
-                <v-dialog v-model="preview" width="500">
-                    <v-card>
-                        <v-card-title class="headline lighten-2" >Preview Image</v-card-title>
+                <v-dialog v-model="preview.open" width="600">
+                    <v-card class="file-container">
+                        <v-card-title class="headline lighten-2" >File Preview</v-card-title>
 
                         <v-card-text>
-                            <v-img
-                                :aspect-ratio="16/9"
-                                contain
-                                v-bind:src="this.previewImage"
-                            >
-                            </v-img>
+                            <object class="file-preview" v-bind:data="this.preview.url" v-bind:type="this.preview.mime"></object>
                         </v-card-text>
 
                         <v-divider></v-divider>
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" text @click="preview = false">Close</v-btn>
+                            <v-btn color="primary" text @click="preview.open = false">Close</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
@@ -120,8 +97,11 @@ export default {
             ],
             loader: null,
             loading: true,
-            preview: false,
-            previewImage: null,
+            preview: {
+                open: false,
+                url: null,
+                mime: null
+            },
             error: "",
             selected: [],
             modes: ["download", "edit", "delete", "preview"]
@@ -173,8 +153,11 @@ export default {
 
                 switch (mode) {
                     case "preview":
-                        this.preview = true;
-                        this.previewImage = `/api/v1/user/file/${this.getIdsFromObject(data)[0]}`;
+                        this.preview = {
+                            open: true,
+                            url: `/api/v1/user/file/${this.getIdsFromObject(data)[0]}`,
+                            mime: data.upload_mime
+                        }
                         break;
                     default:
                         this.$store
@@ -215,4 +198,13 @@ export default {
 
 <style lang="scss">
 @import "../styles/_loader.scss";
+
+.file-preview {
+    max-width: 500px;
+    max-height: 500px;
+}
+.file-container {
+    margin: 0 auto;
+    text-align: center;
+}
 </style>
