@@ -113,7 +113,7 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement}`, tableParams, function (error, results, fields) {
+                let q = connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement}`, tableParams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }
@@ -136,20 +136,43 @@ class DatabaseManager {
      * @param {object} set   | Values to change
      * @param {object} where | Conditions for the selection
      */
-    async update(table, set, where) {
+    async update(options) {
+        let table = options.table,
+            set = options.set,
+            where = options.where || undefined;
+
         return new Promise(async (resolve, reject) => {
-            let tableparams = [table, set];
-            let selectStatement = '';
+            let tableParams = [table, set];
+            let updateStatement = '';
 
-            if (where != null) {
-                Object.keys(where).forEach((key) => {
-                    tableparams.push({ [key]: where[key] });
-                })
-            }
+            if (where) {
+                updateStatement += "WHERE ?";
+                if (Array.isArray(where)) {
+                    for (let i = 0; i < where.length; i++) {
+                        let keys = Object.keys(where[i]);
 
-            if (tableparams.length > 2) {
-                selectStatement = 'WHERE ?';
-                selectStatement += ' AND ?'.repeat(tableparams.length - 3);
+                        keys.forEach(key => {
+                            tableParams.push({ [key]: where[i][key] });
+                        });
+
+                        if (keys.length > 1) {
+                            updateStatement += "AND ?".repeat(keys.length - 1);
+                        }
+
+                        if (i < where.length - 1) {
+                            updateStatement += " OR ?";
+                        }
+                    }
+                } else {
+                    let keys = Object.keys(where);
+                    keys.forEach((key) => {
+                        tableParams.push({ [key]: where[key] });
+                    });
+
+                    if (keys.length > 1) {
+                        updateStatement += " AND ?".repeat(keys.length - 1);
+                    }
+                }
             }
 
             let connection = await this.getConnection()
@@ -158,7 +181,7 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                connection.query(`UPDATE ?? SET ? ${selectStatement}`, tableparams, (error, results, fields) => {
+                let q = connection.query(`UPDATE ?? SET ? ${updateStatement}`, tableParams, (error, results, fields) => {
                     if (error) {
                         reject(error);
                     }
@@ -166,6 +189,8 @@ class DatabaseManager {
                     connection.release();
                     resolve(results);
                 });
+
+                console.log(q.sql);
             }
         });
     }

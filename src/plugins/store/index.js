@@ -90,7 +90,6 @@ export default new Vuex.Store({
 
         getFiles(state, data) {
             state.user.files = data;
-            console.log(data);
         },
     },
     actions: {
@@ -262,8 +261,10 @@ export default new Vuex.Store({
         },
 
         fileOperation({ commit }, payload) {
-            return new Promise((resolve, reject) => {
-                switch(payload.mode) {
+            console.log(payload);
+
+            return new Promise(async (resolve, reject) => {
+                switch (payload.mode) {
                     case "download":
                         let download = document.createElement("a");
                         download.href = `/api/v1/user/file/${payload.data[0]}/download`
@@ -272,6 +273,34 @@ export default new Vuex.Store({
                         download.remove();
                         resolve(true);
                         break;
+
+                    case "delete":
+                        console.log(payload.data);
+                        let response = await fetch(`/api/v1/user/files/delete`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                files: payload.data
+                            })
+                        })
+                            .catch((error) => {
+                                console.error(error);
+                            })
+
+                        if (response.ok) {
+                            console.log(response);
+                        } else {
+                            switch (response.status) {
+                                case 401:
+                                    commit("noAuth", payload.self);
+                                    break;
+                                default:
+                                    console.error("Unknown status");
+                                    break;
+                            }
+                        }
+                        break;
+
                     default:
                         resolve(false);
                         break;

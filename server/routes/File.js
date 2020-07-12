@@ -127,7 +127,7 @@ class FileGet extends RouteBase {
             database.select({
                 columns: "*",
                 from: process.env.UPLOAD_TABLE_V1,
-                where: { id: fileId }
+                where: { id: fileId, upload_deleted: false }
             })
                 .then((r) => {
                     if (r.length > 0) {

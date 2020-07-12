@@ -5,6 +5,7 @@ const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, p
 const FileRegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
 const fs = require("fs");
+const { S_IFBLK } = require("constants");
 
 class User extends RouteBase {
 
@@ -82,7 +83,7 @@ class User extends RouteBase {
                 ${process.env.UPLOAD_TABLE_V1}.upload_url, 
                 COUNT(${process.env.VIEW_TABLE_V1}.view_id) as upload_views`,
             from: process.env.UPLOAD_TABLE_V1,
-            where: { upload_user: req.user.id, ...options },
+            where: { upload_user: req.user.id, upload_deleted: false, ...options },
             join: {
                 mode: "LEFT",
                 from: { id: "id" },
@@ -111,12 +112,68 @@ class User extends RouteBase {
         }
     }
 
+    async deleteFiles(req, res) {
+        let query = {
+            table: process.env.UPLOAD_TABLE_V1,
+            set: { upload_deleted: true },
+            where: []
+        }
+
+        let files = req.body.files;
+        if (Array.isArray(files)) {
+            files.forEach((file) => {
+                query.where.push({
+                    id: file
+                });
+            });
+
+            let results = await database.update(query)
+                .catch((error) => {
+                    console.error(error);
+                    res.status(500).send({
+                        status: 500,
+                        message: "Internal server error"
+                    });
+                });
+
+            if (results && results.affectedRows === files.length) {
+                res.status(202).send({
+                    status: 202,
+                    message: "Accepted"
+                });
+            } else if (results && results.affectedRows < files.length) {
+                res.status(202).send({
+                    status: 202,
+                    message: "Accepted, with warnings",
+                    data: {
+                        requested: files.length,
+                        deleted: results.affectedRows
+                    }
+                });
+            } else {
+                res.status(404).send({
+                    status: 404,
+                    message: "Not found"
+                });
+            }
+        } else {
+            res.status(422).send({
+                status: 422,
+                message: "Unprocessable entity"
+            });
+        }
+
+    }
+
     GetRoutes() {
         return (() => {
             var router = require("express").Router();
 
             router.get("/file/:id/:download?", this.isAuthenticated, this.getFile);
             router.get("/files/:id?", this.isAuthenticated, this.getFiles);
+
+            router.post("/files/delete", this.isAuthenticated, this.deleteFiles);
+
             router.get("/tokens/:id?", this.isAuthenticated, this.getTokens);
 
             return router;
