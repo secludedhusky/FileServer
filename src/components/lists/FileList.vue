@@ -45,7 +45,7 @@
             class="elevation-1"
             show-select
         >
-            <template v-slot:item.upload_filename="{ item }">
+            <!-- <template v-slot:item.upload_filename="{ item }">
                 <span>
                     {{ item.upload_filename }}
                     <v-btn
@@ -56,19 +56,49 @@
                         :href="item.upload_url"
                         target="_BLANK"
                     >
-                        <v-icon>mdi-open-in-new</v-icon>
+                        <v-icon>mdi-eye</v-icon>
                     </v-btn>
                 </span>
-            </template>
+            </template>-->
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
+                <v-icon small class="mr-2" @click="fileOperation('preview', item)">mdi-eye</v-icon>
                 <v-icon small class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
                 <v-icon small class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
                 <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
+            <!-- <template v-slot:expanded-item="{ headers, item }">
+                <td :colspan="headers.length">More info about {{ item.name }}</td>
+            </template>-->
         </v-data-table>
+
+        <template>
+            <div class="text-center">
+                <v-dialog v-model="preview" width="500">
+                    <v-card>
+                        <v-card-title class="headline lighten-2" >Preview Image</v-card-title>
+
+                        <v-card-text>
+                            <v-img
+                                :aspect-ratio="16/9"
+                                contain
+                                v-bind:src="this.previewImage"
+                            >
+                            </v-img>
+                        </v-card-text>
+
+                        <v-divider></v-divider>
+
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="primary" text @click="preview = false">Close</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </div>
+        </template>
     </v-container>
 </template>
 
@@ -81,13 +111,20 @@ export default {
                 { text: "File Name", align: "start", value: "upload_filename" },
                 { text: "Uploaded", value: "upload_date", sortable: true },
                 { text: "Views", value: "upload_views", sortable: true },
-                { text: "Actions", value: "actions", sortable: false }
+                {
+                    text: "Actions",
+                    value: "actions",
+                    sortable: false,
+                    align: "right"
+                }
             ],
             loader: null,
             loading: true,
+            preview: false,
+            previewImage: null,
             error: "",
             selected: [],
-            modes: ["download", "edit", "delete"]
+            modes: ["download", "edit", "delete", "preview"]
         };
     },
     created() {
@@ -115,26 +152,47 @@ export default {
 
             return items;
         },
+        getUrlsFromObject(data) {
+            let items = [];
+
+            if (Array.isArray(data)) {
+                items = data.map(item => {
+                    return item.upload_url;
+                });
+            } else {
+                items.push(data.upload_url);
+            }
+
+            return items;
+        },
         fileOperation(mode, data) {
             if (this.modes.includes(mode)) {
                 if (!data) {
                     data = this.selected;
                 }
 
-                this.$store
-                    .dispatch("fileOperation", {
-                        mode: mode,
-                        data: this.getIdsFromObject(data),
-                        self: this
-                    })
-                    .then(r => {
-                        console.log(r);
-                    })
-                    .catch(error => {
-                        this.error =
-                            "Failed to get files, please try again later.";
-                        setTimeout(() => (this.loading = false), 1000);
-                    });
+                switch (mode) {
+                    case "preview":
+                        this.preview = true;
+                        this.previewImage = `/api/v1/user/file/${this.getIdsFromObject(data)[0]}`;
+                        break;
+                    default:
+                        this.$store
+                            .dispatch("fileOperation", {
+                                mode: mode,
+                                data: this.getIdsFromObject(data),
+                                self: this
+                            })
+                            .then(r => {
+                                console.log(r);
+                            })
+                            .catch(error => {
+                                this.error =
+                                    "File operation failed, please try again later.";
+                                setTimeout(() => (this.loading = false), 1000);
+                            });
+                        break;
+                }
             }
         },
 

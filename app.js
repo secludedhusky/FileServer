@@ -40,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Custom Routes
+// TODO: Dynamically register
 app.use(`${process.env.API_V1}`, new File().GetRoutes());
 app.use(`${process.env.API_V1}/server`, new Server().GetRoutes());
 app.use(`${process.env.API_V1}/auth`, new Authentication().GetRoutes());

@@ -33,7 +33,7 @@ class RouteBase {
                 done(error);
             });
 
-        if (data.user_name === username) {
+        if (data && data.user_name === username) {
             let match = await bcrypt.compare(password, data.user_pass);
             if (match) {
                 done(null, {

@@ -1,14 +1,14 @@
 const RouteBase = require("./RouteBase");
+
 const DatabaseManager = require("../lib/database-manager");
 const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
-const RegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+const FileRegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
 const path = require('path');
 const fs = require('fs-extra');
 const mime = require("mime-types");
 const { v4: uuid } = require("uuid");
-
 const moment = require("moment");
 
 class FileGet extends RouteBase {
@@ -23,7 +23,7 @@ class FileGet extends RouteBase {
      * @param {object} res | Handle responses
      */
     async uploadFile(req, res) {
-        if (req.headers.hasOwnProperty("authorization") && RegEx.exec(req.headers.authorization)) {
+        if (req.headers.hasOwnProperty("authorization") && FileRegEx.exec(req.headers.authorization)) {
             let incomingToken = req.headers.authorization;
 
             let token = await database.select({
@@ -123,7 +123,7 @@ class FileGet extends RouteBase {
     async getFile(req, res) {
         let fileId = req.params.uuid;
 
-        if (RegEx.exec(fileId)) {
+        if (FileRegEx.exec(fileId)) {
             database.select({
                 columns: "*",
                 from: process.env.UPLOAD_TABLE_V1,

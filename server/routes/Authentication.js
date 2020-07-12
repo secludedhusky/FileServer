@@ -120,7 +120,7 @@ class Authentication extends RouteBase {
         res.clearCookie('connect.sid', { path: '/' }).status(200)
             .send({
                 status: 200,
-                message: `Logged out.`
+                message: `Logged out`
             });
     }
 

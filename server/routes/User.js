@@ -2,7 +2,9 @@ const RouteBase = require("./RouteBase");
 const DatabaseManager = require("../lib/database-manager");
 const database = new DatabaseManager(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_DATABASE);
 
-const passport = require("passport");
+const FileRegEx = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+
+const fs = require("fs");
 
 class User extends RouteBase {
 
@@ -11,7 +13,6 @@ class User extends RouteBase {
     }
 
     async getTokens(req, res) {
-        // Single token selection property
         let options = {};
         if (req.params.hasOwnProperty("id")) {
             options.token_id = req.params.id;
@@ -21,6 +22,48 @@ class User extends RouteBase {
             status: 204,
             message: "No content"
         });
+    }
+
+    async getFile(req, res) {
+        let fileId = req.params.id;
+
+        if (FileRegEx.exec(fileId)) {
+            database.select({
+                columns: "*",
+                from: process.env.UPLOAD_TABLE_V1,
+                where: { id: fileId }
+            })
+                .then((r) => {
+                    if (r.length > 0) {
+                        let fileData = r[0];
+                        let file = fs.createReadStream(fileData.upload_path);
+                        let headers = {
+                            "Content-Type": `${fileData.upload_mime}`,
+                            "Content-Disposition": `filename="${fileData.upload_filename}"`
+                        };
+
+                        res.status(200).set(headers);
+                        file.pipe(res);
+                    } else {
+                        res.status(404).send({
+                            status: 404,
+                            message: "File does not exist"
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    res.status(500).send({
+                        status: 500,
+                        message: error.message
+                    });
+                });
+        } else {
+            res.status(404).send({
+                status: 404,
+                message: `No file found with id: ${fileId}`
+            });
+        }
     }
 
     async getFiles(req, res) {
@@ -71,6 +114,7 @@ class User extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
+            router.get("/file/:id", this.isAuthenticated, this.getFile);
             router.get("/files/:id?", this.isAuthenticated, this.getFiles);
             router.get("/tokens/:id?", this.isAuthenticated, this.getTokens);
 

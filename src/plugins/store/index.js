@@ -151,6 +151,15 @@ export default new Vuex.Store({
                 }
             });
         },
+        logout({ commit }, self) {
+            return fetch(`${process.env.API_URI_V1}/auth/logout`)
+                .then((r) => {
+                    commit("noAuth", self);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        },
         checkAuth({ commit }, self) {
             return fetch(`${process.env.API_URI_V1}/auth/check`, { credentials: "include", })
                 .then((r) => {
@@ -250,16 +259,6 @@ export default new Vuex.Store({
                     reject(response);
                 }
             });
-        },
-
-        logout({ commit }, self) {
-            return fetch(`${process.env.API_URI_V1}/auth/logout`)
-                .then((r) => {
-                    commit("noAuth", self);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
         },
 
         fileOperation({ commit }, payload) {
