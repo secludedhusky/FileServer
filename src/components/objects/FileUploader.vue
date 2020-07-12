@@ -32,7 +32,7 @@
                         </v-list-item-action>
                         <v-list-item-content>
                             <v-list-item-title>Private</v-list-item-title>
-                            <v-list-item-subtitle>Make these uploads private, you can always change this later.</v-list-item-subtitle>
+                            <v-list-item-subtitle>Make these uploads private, anyone accessing the files will require permission or token link. You can always change this in the file settings.</v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
