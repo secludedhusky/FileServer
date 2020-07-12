@@ -35,30 +35,41 @@ class Authentication extends RouteBase {
     }
 
     async checkDuplicates(request) {
-        let check = await database.select({
-            columns: "user_name, user_email",
-            from: process.env.USER_TABLE_V1,
-            where: [
-                { user_name: request.username },
-                { user_email: request.email }
-            ],
-            options: {
-                singleItem: true
+        return new Promise(async (resolve, reject) => {
+            let errors = [];
+            let check = await database.select({
+                columns: "user_name, user_email",
+                from: process.env.USER_TABLE_V1,
+                where: [
+                    { user_name: request.username },
+                    { user_email: request.email }
+                ],
+                options: {
+                    singleItem: true
+                }
+            })
+                .catch((error) => {
+                    reject(error);
+                    errors.push(error);
+                });
+
+            if(errors.length > 0) {
+                reject(errors);
+            } else {
+                let conflicts = [];
+                if (check.hasOwnProperty("user_name") && check.user_name === request.username) {
+                    conflicts.push("user_name");
+                }
+                if (check.hasOwnProperty("user_email") && check.user_email === request.email) {
+                    conflicts.push("user_email");
+                }
+    
+                resolve({
+                    valid: (conflicts.length === 0),
+                    data: conflicts
+                });
             }
         });
-
-        let conflicts = [];
-        if (check.hasOwnProperty("user_name") && check.user_name === request.username) {
-            conflicts.push("user_name");
-        }
-        if (check.hasOwnProperty("user_email") && check.user_email === request.email) {
-            conflicts.push("user_email");
-        }
-
-        return {
-            valid: (conflicts.length === 0),
-            data: conflicts
-        };
     }
 
     async check(req, res) {
@@ -114,6 +125,7 @@ class Authentication extends RouteBase {
     }
 
     async register(req, res) {
+        let errors = [];
         let inputCheck = await this.validateInputs(req.body);
         if (!inputCheck.valid) {
             res.status(422).send({
@@ -124,7 +136,19 @@ class Authentication extends RouteBase {
             return;
         }
 
-        let duplicateCheck = await this.checkDuplicates(req.body);
+        let duplicateCheck = await this.checkDuplicates(req.body)
+            .catch((error) => {
+                errors.push(error);
+                res.status(500).send({
+                    status: 500,
+                    message: "Internal server error"
+                });
+            });
+
+        if(errors.length > 0) {
+            return;
+        }
+
         if (!duplicateCheck.valid) {
             res.status(409).send({
                 status: 409,
@@ -135,8 +159,8 @@ class Authentication extends RouteBase {
         }
 
         bcrypt.hash(req.body.password, 10)
-            .then((hash) => {
-                database.insert(process.env.USER_TABLE_V1, {
+            .then(async (hash) => {
+                await database.insert(process.env.USER_TABLE_V1, {
                     id: uuid(),
                     user_name: req.body.username,
                     user_pass: hash,
@@ -171,8 +195,7 @@ class Authentication extends RouteBase {
                     status: 500,
                     message: "Internal server error"
                 });
-                return;
-            })
+            });
     }
 
     GetRoutes() {
