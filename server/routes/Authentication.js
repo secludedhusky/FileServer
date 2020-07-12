@@ -53,7 +53,7 @@ class Authentication extends RouteBase {
                     errors.push(error);
                 });
 
-            if(errors.length > 0) {
+            if (errors.length > 0) {
                 reject(errors);
             } else {
                 let conflicts = [];
@@ -63,7 +63,7 @@ class Authentication extends RouteBase {
                 if (check.hasOwnProperty("user_email") && check.user_email === request.email) {
                     conflicts.push("user_email");
                 }
-    
+
                 resolve({
                     valid: (conflicts.length === 0),
                     data: conflicts
@@ -145,7 +145,7 @@ class Authentication extends RouteBase {
                 });
             });
 
-        if(errors.length > 0) {
+        if (errors.length > 0) {
             return;
         }
 

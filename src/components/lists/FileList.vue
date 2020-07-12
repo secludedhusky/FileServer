@@ -60,10 +60,14 @@
             <div class="text-center">
                 <v-dialog v-model="preview.open" width="600">
                     <v-card class="file-container">
-                        <v-card-title class="headline lighten-2" >File Preview</v-card-title>
+                        <v-card-title class="headline lighten-2">File Preview</v-card-title>
 
                         <v-card-text>
-                            <object class="file-preview" v-bind:data="this.preview.url" v-bind:type="this.preview.mime"></object>
+                            <object
+                                class="file-preview"
+                                v-bind:data="this.preview.url"
+                                v-bind:type="this.preview.mime"
+                            ></object>
                         </v-card-text>
 
                         <v-divider></v-divider>
@@ -155,9 +159,11 @@ export default {
                     case "preview":
                         this.preview = {
                             open: true,
-                            url: `/api/v1/user/file/${this.getIdsFromObject(data)[0]}`,
+                            url: `/api/v1/user/file/${
+                                this.getIdsFromObject(data)[0]
+                            }`,
                             mime: data.upload_mime
-                        }
+                        };
                         break;
                     default:
                         this.$store

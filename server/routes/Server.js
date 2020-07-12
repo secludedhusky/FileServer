@@ -13,7 +13,7 @@ class Server extends RouteBase {
 
     async getStats(req, res) {
         let errors = [];
-        let fileCount = database.select({
+        let fileCount = await database.select({
             columns: "COUNT(id) as files",
             from: process.env.UPLOAD_TABLE_V1,
             options: {
@@ -24,7 +24,7 @@ class Server extends RouteBase {
                 errors.push(error);
             });
 
-        let viewCount = database.select({
+        let viewCount = await database.select({
             columns: "COUNT(id) as views",
             from: process.env.VIEW_TABLE_V1,
             options: {
