@@ -74,7 +74,7 @@
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" text @click="preview.open = false">Close</v-btn>
+                            <v-btn color="primary" text @click="closePreview()">Close</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
@@ -184,7 +184,6 @@ export default {
                 }
             }
         },
-
         getFiles() {
             this.error = "";
 
@@ -197,6 +196,11 @@ export default {
                     this.error = "Failed to get files, please try again later.";
                     setTimeout(() => (this.loading = false), 1000);
                 });
+        },
+        closePreview() {
+            preview.url = null;
+            preview.mime = null;
+            preview.open = false;
         }
     }
 };

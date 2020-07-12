@@ -263,6 +263,12 @@ export default new Vuex.Store({
 
         fileOperation({ commit }, payload) {
             return new Promise((resolve, reject) => {
+                let download = document.createElement("a");
+                download.href = `/api/v1/user/file/${payload.data[0]}/download`
+                download.download = "file";
+                download.click();
+                download.remove();
+
                 resolve(true);
             })
         },

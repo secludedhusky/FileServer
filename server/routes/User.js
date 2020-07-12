@@ -26,6 +26,7 @@ class User extends RouteBase {
 
     async getFile(req, res) {
         let fileId = req.params.id;
+        let download = req.params.download ? true : false;
 
         if (FileRegEx.exec(fileId)) {
             database.select({
@@ -39,7 +40,7 @@ class User extends RouteBase {
                         let file = fs.createReadStream(fileData.upload_path);
                         let headers = {
                             "Content-Type": `${fileData.upload_mime}`,
-                            "Content-Disposition": `filename="${fileData.upload_filename}"`
+                            "Content-Disposition": `${download ? "attachment; " : ""}filename="${fileData.upload_filename}"`
                         };
 
                         res.status(200).set(headers);
@@ -114,7 +115,7 @@ class User extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
-            router.get("/file/:id", this.isAuthenticated, this.getFile);
+            router.get("/file/:id/:download?", this.isAuthenticated, this.getFile);
             router.get("/files/:id?", this.isAuthenticated, this.getFiles);
             router.get("/tokens/:id?", this.isAuthenticated, this.getTokens);
 
