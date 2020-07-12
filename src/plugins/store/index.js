@@ -91,6 +91,13 @@ export default new Vuex.Store({
         getFiles(state, data) {
             state.user.files = data;
         },
+        deletedFiles(state, data) {
+            return new Promise(async (resolve, reject) => {
+                state.user.files = state.user.files.filter((file) => {
+                    return !data.includes(file.id);
+                });
+            })
+        }
     },
     actions: {
         login({ commit }, payload) {
@@ -261,8 +268,6 @@ export default new Vuex.Store({
         },
 
         fileOperation({ commit }, payload) {
-            console.log(payload);
-
             return new Promise(async (resolve, reject) => {
                 switch (payload.mode) {
                     case "download":
@@ -275,7 +280,6 @@ export default new Vuex.Store({
                         break;
 
                     case "delete":
-                        console.log(payload.data);
                         let response = await fetch(`/api/v1/user/files/delete`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -288,7 +292,8 @@ export default new Vuex.Store({
                             })
 
                         if (response.ok) {
-                            console.log(response);
+                            commit("deletedFiles", payload.data);
+                            resolve(response);
                         } else {
                             switch (response.status) {
                                 case 401:

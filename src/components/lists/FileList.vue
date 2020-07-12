@@ -172,14 +172,12 @@ export default {
                                 data: this.getIdsFromObject(data),
                                 self: this
                             })
-                            .then(r => {
-                                console.log(r);
-                            })
                             .catch(error => {
                                 this.error =
                                     "File operation failed, please try again later.";
                                 setTimeout(() => (this.loading = false), 1000);
                             });
+                        this.selected = [];
                         break;
                 }
             }
