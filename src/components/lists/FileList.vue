@@ -34,15 +34,18 @@
         </v-row>
 
         <v-data-table
-            loading-text="Please wait..."
             :loading="loading"
-            v-model="selected"
             :headers="headers"
             :items="this.$store.getters.myFiles"
+            v-model="selected"
+            loading-text="Please wait..."
             class="elevation-1"
             show-select
         >
-            <template v-slot:item.upload_date="{ item }">
+            <template
+                v-show="$vuetify.breakpoint.mdAndDown"
+                v-slot:item.upload_date="{ item }"
+            >
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
@@ -52,7 +55,6 @@
                 <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
         </v-data-table>
-
         <template>
             <div class="text-center">
                 <v-dialog v-model="preview.open" width="600">
@@ -193,9 +195,9 @@ export default {
                 });
         },
         closePreview() {
-            preview.url = null;
-            preview.mime = null;
-            preview.open = false;
+            this.preview.url = null;
+            this.preview.mime = null;
+            this.preview.open = false;
         }
     }
 };

@@ -34,7 +34,7 @@
                         </transition>
                     </v-main>
 
-                    <v-footer app>
+                    <v-footer class="hidden-md-and-down" app>
                         <span>{{ copy }} &copy; {{ new Date().getFullYear() }}</span>
                     </v-footer>
                 </v-app>
