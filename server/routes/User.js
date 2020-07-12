@@ -38,15 +38,30 @@ class User extends RouteBase {
                 .then((r) => {
                     if (r.length > 0) {
                         let fileData = r[0];
-                        let file = fs.createReadStream(fileData.upload_path);
-                        let headers = {
-                            "Content-Type": `${fileData.upload_mime}`,
-                            "Content-Disposition": `${download ? "attachment; " : ""}filename="${fileData.upload_filename}"`
-                        };
+                        try {
+                            let file = fs.createReadStream(fileData.upload_path)
+                            file.on('error', function () {
+                                res.status(404).send({
+                                    status: 404,
+                                    message: "File does not exist"
+                                });
+                            });
 
-                        res.status(200).set(headers);
-                        file.pipe(res);
-                    } else {
+                            file.on('open', function () {
+                                let headers = {
+                                    "Content-Type": `${fileData.upload_mime}`,
+                                    "Content-Disposition": `${download ? "attachment; " : ""}filename="${fileData.upload_filename}"`
+                                };
+
+                                res.status(200).set(headers);
+                                file.pipe(res);
+                            });
+
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+                    else {
                         res.status(404).send({
                             status: 404,
                             message: "File does not exist"
