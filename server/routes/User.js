@@ -25,6 +25,7 @@ class User extends RouteBase {
         });
     }
 
+    // TODO: Share file logic between public and private get file logic.
     async getFile(req, res) {
         let fileId = req.params.id;
         let download = req.params.download ? true : false;
@@ -35,28 +36,55 @@ class User extends RouteBase {
                 from: process.env.UPLOAD_TABLE_V1,
                 where: { id: fileId }
             })
-                .then((r) => {
+                .then(async (r) => {
                     if (r.length > 0) {
                         let fileData = r[0];
                         try {
-                            let file = fs.createReadStream(fileData.upload_path)
-                            file.on('error', function () {
-                                res.status(404).send({
-                                    status: 404,
-                                    message: "File does not exist"
+                            let stats = fs.statSync(fileData.upload_path);
+                            let total = stats.size;
+
+                            if (req.headers.range) {
+                                console.log("Rewrite range");
+                                var range = req.headers.range;
+                                var parts = range.replace(/bytes=/, "").split("-");
+                                var partialStart = parts[0];
+                                var partialEnd = parts[1];
+
+                                var start = parseInt(partialStart, 10);
+                                var end = partialEnd ? parseInt(partialEnd, 10) : total - 1;
+                                var chunkSize = (end - start) + 1;
+                                var readStream = fs.createReadStream(fileData.upload_path, { start: start, end: end });
+
+                                res.status(206).set({
+                                    'Connection': 'keep-alive',
+                                    "Content-Range": "bytes " + start + "-" + end + "/" + total,
+                                    "Accept-Ranges": "bytes",
+                                    "Content-Length": chunkSize,
+                                    "Content-Type": fileData.upload_mime
                                 });
-                            });
+                                readStream.pipe(res);
+                            } else {
+                                let file = fs.createReadStream(fileData.upload_path)
+                                file.on('error', function () {
+                                    res.status(404).send({
+                                        status: 404,
+                                        message: "File does not exist"
+                                    });
+                                });
 
-                            file.on('open', function () {
-                                let headers = {
-                                    "Content-Type": `${fileData.upload_mime}`,
-                                    "Content-Disposition": `${download ? "attachment; " : ""}filename="${fileData.upload_filename}"`
-                                };
+                                file.on('open', function () {
+                                    let headers = {
+                                        'Connection': 'keep-alive',
+                                        "Content-Length": stats.size,
+                                        "Accept-Ranges": "bytes",
+                                        "Content-Type": `${fileData.upload_mime}`,
+                                        "Content-Disposition": `${download ? "attachment; " : ""}filename="${fileData.upload_filename}"`
+                                    };
 
-                                res.status(200).set(headers);
-                                file.pipe(res);
-                            });
-
+                                    res.status(200).set(headers);
+                                    file.pipe(res);
+                                });
+                            }
                         } catch (error) {
                             console.log(error);
                         }
@@ -186,7 +214,6 @@ class User extends RouteBase {
 
             router.get("/file/:id/:download?", this.isAuthenticated, this.getFile);
             router.get("/files/:id?", this.isAuthenticated, this.getFiles);
-
             router.post("/files/delete", this.isAuthenticated, this.deleteFiles);
 
             router.get("/tokens/:id?", this.isAuthenticated, this.getTokens);

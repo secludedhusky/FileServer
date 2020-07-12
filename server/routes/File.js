@@ -121,26 +121,68 @@ class FileGet extends RouteBase {
     }
 
     async getFile(req, res) {
-        let fileId = req.params.uuid;
+        let fileId = req.params.id;
 
         if (FileRegEx.exec(fileId)) {
             database.select({
                 columns: "*",
                 from: process.env.UPLOAD_TABLE_V1,
-                where: { id: fileId, upload_deleted: false }
+                where: { id: fileId }
             })
-                .then((r) => {
+                .then(async (r) => {
                     if (r.length > 0) {
                         let fileData = r[0];
-                        let file = fs.createReadStream(fileData.upload_path);
-                        let headers = {
-                            "Content-Type": `${fileData.upload_mime}`,
-                            "Content-Disposition": `filename="${fileData.upload_filename}"`
-                        };
+                        try {
+                            let stats = fs.statSync(fileData.upload_path);
+                            let total = stats.size;
 
-                        res.status(200).set(headers);
-                        file.pipe(res);
-                    } else {
+                            if (req.headers.range) {
+                                console.log("Rewrite range");
+                                var range = req.headers.range;
+                                var parts = range.replace(/bytes=/, "").split("-");
+                                var partialStart = parts[0];
+                                var partialEnd = parts[1];
+
+                                var start = parseInt(partialStart, 10);
+                                var end = partialEnd ? parseInt(partialEnd, 10) : total - 1;
+                                var chunkSize = (end - start) + 1;
+                                var readStream = fs.createReadStream(fileData.upload_path, { start: start, end: end });
+
+                                res.status(206).set({
+                                    'Connection': 'keep-alive',
+                                    "Content-Range": "bytes " + start + "-" + end + "/" + total,
+                                    "Accept-Ranges": "bytes",
+                                    "Content-Length": chunkSize,
+                                    "Content-Type": fileData.upload_mime
+                                });
+                                readStream.pipe(res);
+                            } else {
+                                let file = fs.createReadStream(fileData.upload_path)
+                                file.on('error', function () {
+                                    res.status(404).send({
+                                        status: 404,
+                                        message: "File does not exist"
+                                    });
+                                });
+
+                                file.on('open', function () {
+                                    let headers = {
+                                        'Connection': 'keep-alive',
+                                        "Content-Length": stats.size,
+                                        "Accept-Ranges": "bytes",
+                                        "Content-Type": `${fileData.upload_mime}`,
+                                        "Content-Disposition": `filename="${fileData.upload_filename}"`
+                                    };
+
+                                    res.status(200).set(headers);
+                                    file.pipe(res);
+                                });
+                            }
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+                    else {
                         res.status(404).send({
                             status: 404,
                             message: "File does not exist"
@@ -191,7 +233,7 @@ class FileGet extends RouteBase {
         return (() => {
             var router = require("express").Router();
 
-            router.get("/:uuid", this.getFile);
+            router.get("/:id", this.getFile);
             router.post("/", this.uploadFile);
 
             return router;
