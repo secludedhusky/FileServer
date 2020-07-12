@@ -181,7 +181,7 @@ class DatabaseManager {
                 });
 
             if (connection) {
-                let q = connection.query(`UPDATE ?? SET ? ${updateStatement}`, tableParams, (error, results, fields) => {
+                connection.query(`UPDATE ?? SET ? ${updateStatement}`, tableParams, (error, results, fields) => {
                     if (error) {
                         reject(error);
                     }
@@ -189,8 +189,6 @@ class DatabaseManager {
                     connection.release();
                     resolve(results);
                 });
-
-                console.log(q.sql);
             }
         });
     }
