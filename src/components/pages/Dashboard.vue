@@ -3,8 +3,8 @@
         <h1>Dashboard</h1>
         <v-container fluid>
             <user-profile></user-profile>
-            <file-uploader></file-uploader>
             <file-list></file-list>
+            <file-uploader></file-uploader>
         </v-container>
     </v-container>
 </template>
