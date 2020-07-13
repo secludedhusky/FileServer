@@ -37,25 +37,27 @@
             :loading="loading"
             :headers="headers"
             :items="this.$store.getters.myFiles"
+            :show-select="!isMobile"
             v-model="selected"
             loading-text="Please wait..."
-            :class="{mobile: isMobile}"
-            @click:row="viewFile"
-            :show-select="!isMobile"
             v-resize="onResize"
         >
+            <template v-if="!isMobile" v-slot:item.upload_filename="{ item }">
+                <v-btn v-on:click="viewFile(item)" text small>{{ item.upload_filename }}</v-btn>
+            </template>
+            <template v-else v-slot:item.upload_filename="{ item }">{{ item.upload_filename }}</template>
+
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
+
             <template v-if="!isMobile" v-slot:item.actions="{ item }">
                 <v-icon small class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
                 <v-icon small class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
                 <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
             <template v-else v-slot:item.actions="{ item }">
-                <v-icon large class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
-                <v-icon large class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
-                <v-icon large color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
+                <v-icon large color="mr-2" @click="viewFile(item)">mdi-eye</v-icon>
             </template>
         </v-data-table>
     </v-container>
@@ -101,7 +103,7 @@ export default {
             headers.push({
                 text: "Actions",
                 value: "actions",
-                sortable: true,
+                sortable: false,
                 align: "right"
             });
 
@@ -216,62 +218,4 @@ export default {
 
 <style lang="scss">
 @import "../styles/_loader.scss";
-.mobile {
-    color: #333;
-}
-
-@media screen and (max-width: 768px) {
-    .mobile table.v-table tr {
-        max-width: 100%;
-        position: relative;
-        display: block;
-    }
-
-    .mobile table.v-table tr:nth-child(odd) {
-        border-left: 6px solid deeppink;
-    }
-
-    .mobile table.v-table tr:nth-child(even) {
-        border-left: 6px solid cyan;
-    }
-
-    .mobile table.v-table tr td {
-        display: flex;
-        width: 100%;
-        border-bottom: 1px solid #f5f5f5;
-        height: auto;
-        padding: 10px;
-    }
-
-    .mobile table.v-table tr td ul li:before {
-        content: attr(data-label);
-        padding-right: 0.5em;
-        text-align: left;
-        display: block;
-        color: #999;
-    }
-    .v-datatable__actions__select {
-        width: 50%;
-        margin: 0px;
-        justify-content: flex-start;
-    }
-    .mobile .theme--light.v-table tbody tr:hover:not(.v-datatable__expand-row) {
-        background: transparent;
-    }
-}
-.flex-content {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-.flex-item {
-    padding: 5px;
-    width: 50%;
-    height: 40px;
-    font-weight: bold;
-}
 </style>
