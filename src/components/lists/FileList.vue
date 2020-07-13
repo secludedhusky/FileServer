@@ -43,9 +43,15 @@
             v-resize="onResize"
         >
             <template v-if="!isMobile" v-slot:item.upload_filename="{ item }">
-                <v-btn v-on:click="viewFile(item)" text small>{{ item.upload_filename }}</v-btn>
+                <v-btn v-on:click="viewFile(item)" text small>
+                    <v-icon left dark>mdi-{{ getMimeIcon(item.upload_mime )}}</v-icon>
+                    {{ item.upload_filename }}
+                </v-btn>
             </template>
-            <template v-else v-slot:item.upload_filename="{ item }">{{ item.upload_filename }}</template>
+            <template v-else v-slot:item.upload_filename="{ item }">
+                <v-icon left dark>mdi-{{ getMimeIcon(item.upload_mime )}}</v-icon>
+                {{ item.upload_filename }}
+            </template>
 
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
@@ -64,6 +70,8 @@
 </template>
 
 <script>
+import MimeTypes from "../../plugins/mimetypes";
+
 export default {
     name: "file-list",
     data() {
@@ -110,7 +118,7 @@ export default {
             return headers;
         },
         isMobile() {
-            this.mobile = window.innerWidth < 820;
+            this.mobile = window.innerWidth < 940;
             return this.mobile;
         }
     },
@@ -204,13 +212,22 @@ export default {
                 });
         },
         viewFile(item) {
+            console.log(item);
             this.$router.push({
                 name: `view-file`,
                 params: { file: item.id, mime: item.upload_mime }
             });
         },
         onResize() {
-            this.mobile = window.innerWidth < 820;
+            this.mobile = window.innerWidth < 940;
+        },
+        getMimeIcon(mime) {
+            try {
+                console.log(mime, MimeTypes[mime]);
+                return MimeTypes.hasOwnProperty(mime) ? MimeTypes[mime] : "help-circle-outline";
+            } catch (e) {
+                return "help-circle-outline";
+            }
         }
     }
 };
