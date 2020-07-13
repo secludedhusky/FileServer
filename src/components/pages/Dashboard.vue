@@ -1,5 +1,12 @@
 <template>
-    <v-container>
+    <v-container
+        v-touch="{
+            left: () => swipe('Left'),
+            right: () => swipe('Right'),
+            up: () => swipe('Up'),
+            down: () => swipe('Down')
+        }"
+    >
         <h1>Dashboard</h1>
         <v-container fluid>
             <user-profile></user-profile>
@@ -20,6 +27,11 @@ export default {
         FileList,
         UserProfile,
         FileUploader
+    },
+    methods: {
+        swipe(direction) {
+            this.swipeDirection = direction;
+        }
     },
     created: function() {
         if (!this.$store.getters.loggedIn) {

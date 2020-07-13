@@ -57,6 +57,7 @@ export default {
         }
     },
     data: () => ({
+        swipeDirection: "None",
         copy: "XenPowered",
         drawer: true,
         dataReady: false,

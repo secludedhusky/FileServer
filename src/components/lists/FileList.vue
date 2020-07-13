@@ -39,17 +39,23 @@
             :items="this.$store.getters.myFiles"
             v-model="selected"
             loading-text="Please wait..."
-            class="elevation-1"
+            :class="{mobile: isMobile}"
             @click:row="viewFile"
-            show-select
+            :show-select="!isMobile"
+            v-resize="onResize"
         >
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
-            <template v-slot:item.actions="{ item }">
+            <template v-if="!isMobile" v-slot:item.actions="{ item }">
                 <v-icon small class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
                 <v-icon small class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
                 <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
+            </template>
+            <template v-else v-slot:item.actions="{ item }">
+                <v-icon large class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
+                <v-icon large class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
+                <v-icon large color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
         </v-data-table>
     </v-container>
@@ -60,17 +66,6 @@ export default {
     name: "file-list",
     data() {
         return {
-            headers: [
-                { text: "File Name", align: "start", value: "upload_filename" },
-                { text: "Uploaded", value: "upload_date", sortable: true },
-                { text: "Views", value: "upload_views", sortable: true },
-                {
-                    text: "Actions",
-                    value: "actions",
-                    sortable: false,
-                    align: "right"
-                }
-            ],
             loader: null,
             loading: true,
             preview: {
@@ -80,8 +75,42 @@ export default {
             },
             error: "",
             selected: [],
-            modes: ["download", "edit", "delete"]
+            modes: ["download", "edit", "delete"],
+            mobile: null
         };
+    },
+    computed: {
+        headers() {
+            let headers = [
+                { text: "File Name", align: "start", value: "upload_filename" }
+            ];
+
+            if (!this.isMobile) {
+                headers.push({
+                    text: "Uploaded",
+                    value: "upload_date",
+                    sortable: true
+                });
+                headers.push({
+                    text: "Views",
+                    value: "upload_views",
+                    sortable: true
+                });
+            }
+
+            headers.push({
+                text: "Actions",
+                value: "actions",
+                sortable: true,
+                align: "right"
+            });
+
+            return headers;
+        },
+        isMobile() {
+            this.mobile = window.innerWidth < 820;
+            return this.mobile;
+        }
     },
     created() {
         this.getFiles();
@@ -92,6 +121,11 @@ export default {
             this[l] = !this[l];
 
             this.loader = null;
+        },
+        mobile: {
+            handler: value => {
+                console.log("changed isMobile");
+            }
         }
     },
     methods: {
@@ -172,6 +206,9 @@ export default {
                 name: `view-file`,
                 params: { file: item.id, mime: item.upload_mime }
             });
+        },
+        onResize() {
+            this.mobile = window.innerWidth < 820;
         }
     }
 };
@@ -179,8 +216,62 @@ export default {
 
 <style lang="scss">
 @import "../styles/_loader.scss";
+.mobile {
+    color: #333;
+}
 
-.media-viewer {
-    margin: 0 auto;
+@media screen and (max-width: 768px) {
+    .mobile table.v-table tr {
+        max-width: 100%;
+        position: relative;
+        display: block;
+    }
+
+    .mobile table.v-table tr:nth-child(odd) {
+        border-left: 6px solid deeppink;
+    }
+
+    .mobile table.v-table tr:nth-child(even) {
+        border-left: 6px solid cyan;
+    }
+
+    .mobile table.v-table tr td {
+        display: flex;
+        width: 100%;
+        border-bottom: 1px solid #f5f5f5;
+        height: auto;
+        padding: 10px;
+    }
+
+    .mobile table.v-table tr td ul li:before {
+        content: attr(data-label);
+        padding-right: 0.5em;
+        text-align: left;
+        display: block;
+        color: #999;
+    }
+    .v-datatable__actions__select {
+        width: 50%;
+        margin: 0px;
+        justify-content: flex-start;
+    }
+    .mobile .theme--light.v-table tbody tr:hover:not(.v-datatable__expand-row) {
+        background: transparent;
+    }
+}
+.flex-content {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.flex-item {
+    padding: 5px;
+    width: 50%;
+    height: 40px;
+    font-weight: bold;
 }
 </style>
