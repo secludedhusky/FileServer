@@ -113,7 +113,7 @@ export default new Vuex.Store({
                     })
                 })
                     .catch((error) => {
-                        reject(response);
+                        reject(error);
                     })
 
                 if (response.ok) {

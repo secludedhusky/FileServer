@@ -22,11 +22,9 @@ export default {
         FileUploader
     },
     created: function() {
-        this.$nextTick(function() {
-            if (!this.$store.getters.loggedIn) {
-                this.$router.push("login");
-            }
-        });
+        if (!this.$store.getters.loggedIn) {
+            this.$router.push({ key: "login" });
+        }
     }
 };
 </script>

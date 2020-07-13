@@ -40,42 +40,18 @@
             v-model="selected"
             loading-text="Please wait..."
             class="elevation-1"
+            @click:row="viewFile"
             show-select
         >
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-icon small class="mr-2" @click="fileOperation('preview', item)">mdi-eye</v-icon>
                 <v-icon small class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
                 <v-icon small class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
                 <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
         </v-data-table>
-        <template>
-            <div class="text-center">
-                <v-dialog v-model="preview.open" width="600">
-                    <v-card class="file-container">
-                        <v-card-title class="headline lighten-2">File Preview</v-card-title>
-
-                        <v-card-text>
-                            <object
-                                class="file-preview"
-                                v-bind:data="this.preview.url"
-                                v-bind:type="this.preview.mime"
-                            ></object>
-                        </v-card-text>
-
-                        <v-divider></v-divider>
-
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="primary" text @click="closePreview()">Close</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
-            </div>
-        </template>
     </v-container>
 </template>
 
@@ -104,7 +80,7 @@ export default {
             },
             error: "",
             selected: [],
-            modes: ["download", "edit", "delete", "preview"]
+            modes: ["download", "edit", "delete"]
         };
     },
     created() {
@@ -191,10 +167,11 @@ export default {
                     setTimeout(() => (this.loading = false), 1000);
                 });
         },
-        closePreview() {
-            this.preview.url = null;
-            this.preview.mime = null;
-            this.preview.open = false;
+        viewFile(item) {
+            this.$router.push({
+                name: `view-file`,
+                params: { file: item.id, mime: item.upload_mime }
+            });
         }
     }
 };
@@ -203,12 +180,7 @@ export default {
 <style lang="scss">
 @import "../styles/_loader.scss";
 
-.file-preview {
-    max-width: 500px;
-    max-height: 500px;
-}
-.file-container {
+.media-viewer {
     margin: 0 auto;
-    text-align: center;
 }
 </style>

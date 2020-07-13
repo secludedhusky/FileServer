@@ -7,6 +7,7 @@ import Logout from "../../components/pages/Logout.vue";
 import Register from "../../components/pages/Register.vue";
 import Statistics from "../../components/pages/Statistics.vue";
 import Dashboard from "../../components/pages/Dashboard.vue";
+import File from "../../components/pages/File.vue";
 
 Vue.use(VueRouter);
 
@@ -46,6 +47,11 @@ export default new VueRouter({
             path: '/dashboard',
             name: 'dashboard',
             component: Dashboard
+        },
+        {
+            path: '/dashboard/view-file',
+            name: 'view-file',
+            component: File
         }
     ]
 });
