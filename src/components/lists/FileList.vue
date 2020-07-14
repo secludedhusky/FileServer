@@ -58,14 +58,50 @@
             </template>
 
             <template v-if="!isMobile" v-slot:item.actions="{ item }">
-                <v-icon
-                    medium
-                    class="mr-2"
-                    @click="fileOperation('copy-link', item)"
-                >mdi-content-copy</v-icon>
-                <v-icon medium class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
-                <v-icon medium class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
-                <v-icon medium color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-icon
+                            v-on="on"
+                            medium
+                            class="mr-2"
+                            @click="fileOperation('copy-link', item)"
+                        >mdi-content-copy</v-icon>
+                    </template>
+                    <span>Copy Link</span>
+                </v-tooltip>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-icon
+                            v-on="on"
+                            medium
+                            class="mr-2"
+                            @click="fileOperation('download', item)"
+                        >mdi-download</v-icon>
+                    </template>
+                    <span>Download File</span>
+                </v-tooltip>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-icon
+                            v-on="on"
+                            medium
+                            class="mr-2"
+                            @click="fileOperation('edit', item)"
+                        >mdi-pencil</v-icon>
+                    </template>
+                    <span>Edit File Settings</span>
+                </v-tooltip>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-icon
+                            v-on="on"
+                            medium
+                            color="red"
+                            @click="fileOperation('delete', item)"
+                        >mdi-delete</v-icon>
+                    </template>
+                    <span>Delete File</span>
+                </v-tooltip>
             </template>
             <template v-else v-slot:item.actions="{ item }">
                 <v-icon large color="mr-2" @click="viewFile(item)">mdi-eye</v-icon>
@@ -78,7 +114,6 @@
 
 <script>
 import MimeTypes from "../../plugins/mimetypes";
-import { text } from "body-parser";
 
 export default {
     name: "file-list",
@@ -140,11 +175,6 @@ export default {
             this[l] = !this[l];
 
             this.loader = null;
-        },
-        mobile: {
-            handler: value => {
-                console.log("changed isMobile");
-            }
         }
     },
     methods: {
@@ -230,7 +260,6 @@ export default {
         },
 
         viewFile(item) {
-            console.log(item);
             this.$router.push({
                 name: `view-file`,
                 params: { file: item.id, mime: item.upload_mime }
@@ -243,7 +272,6 @@ export default {
 
         getMimeIcon(mime) {
             try {
-                console.log(mime, MimeTypes[mime]);
                 return MimeTypes.hasOwnProperty(mime)
                     ? MimeTypes[mime]
                     : "help-circle-outline";
