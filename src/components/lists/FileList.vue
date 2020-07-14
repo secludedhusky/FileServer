@@ -109,11 +109,13 @@
 
             <v-input v-model="copyText" hidden></v-input>
         </v-data-table>
+        <file-editor></file-editor>
     </v-container>
 </template>
 
 <script>
 import MimeTypes from "../../plugins/mimetypes";
+import FileEditor from "../objects/FileEditor.vue";
 
 export default {
     name: "file-list",
@@ -132,6 +134,12 @@ export default {
             mobile: null,
             copyText: null
         };
+    },
+    created() {
+        this.getFiles();
+    },
+    components: {
+        FileEditor
     },
     computed: {
         headers() {
@@ -165,9 +173,6 @@ export default {
             this.mobile = window.innerWidth < 940;
             return this.mobile;
         }
-    },
-    created() {
-        this.getFiles();
     },
     watch: {
         loader() {
@@ -258,7 +263,6 @@ export default {
                     setTimeout(() => (this.loading = false), 1000);
                 });
         },
-
         viewFile(item) {
             this.$router.push({
                 name: `view-file`,

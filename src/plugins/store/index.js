@@ -17,6 +17,17 @@ export default new Vuex.Store({
             branch: null,
             uploads: null,
             views: null,
+        },
+        editor: {
+            open: false,
+            file: {
+                id: null,
+                upload_filename: null,
+                upload_mime: null,
+                upload_url: null,
+                upload_views: null,
+                upload_private: null
+            }
         }
     },
     getters: {
@@ -34,6 +45,9 @@ export default new Vuex.Store({
         },
         getStats: state => {
             return [state.app];
+        },
+        editorState: state => {
+            return state.editor;
         }
     },
     mutations: {
@@ -97,6 +111,28 @@ export default new Vuex.Store({
                     return !data.includes(file.id);
                 });
             })
+        },
+
+        openEditor(state, data) {
+            console.log("Opening editor with", data.data);
+            state.editor = {
+                open: true,
+                file: data.data
+            }
+        },
+        closeEditor(state, data) {
+            console.log("Closing editor with", state.editor.file);
+            state.editor = {
+                open: false,
+                file: {
+                    id: null,
+                    upload_filename: null,
+                    upload_mime: null,
+                    upload_url: null,
+                    upload_views: null,
+                    upload_private: null
+                }
+            }
         }
     },
     actions: {
@@ -251,7 +287,10 @@ export default new Vuex.Store({
                             console.error(error);
                         });
 
-                    commit("getFiles", data.data);
+                    if (!payload.fileId) {
+                        commit("getFiles", data.data);
+                    }
+
                     resolve(data);
                 } else {
                     switch (response.status) {
@@ -278,7 +317,12 @@ export default new Vuex.Store({
                         download.remove();
                         resolve(true);
                         break;
-
+                    case "edit":
+                        let file = await payload.self.$store.dispatch("getFiles", { fileId: payload.data });
+                        commit("openEditor", {
+                            data: file.data[0]
+                        });
+                        break;
                     case "delete":
                         let response = await fetch(`/api/v1/user/files/delete`, {
                             method: "POST",
@@ -312,6 +356,14 @@ export default new Vuex.Store({
                 }
             })
         },
+
+        closeEditor({ commit }, payload) {
+            return new Promise((resolve, reject) => {
+                // todo check cancel/confirm
+                console.log(payload)
+                commit("closeEditor");
+            })
+        }
 
     }
 });
