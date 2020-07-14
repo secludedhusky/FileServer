@@ -58,19 +58,27 @@
             </template>
 
             <template v-if="!isMobile" v-slot:item.actions="{ item }">
-                <v-icon small class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
-                <v-icon small class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
-                <v-icon small color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
+                <v-icon
+                    medium
+                    class="mr-2"
+                    @click="fileOperation('copy-link', item)"
+                >mdi-content-copy</v-icon>
+                <v-icon medium class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
+                <v-icon medium class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
+                <v-icon medium color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
             </template>
             <template v-else v-slot:item.actions="{ item }">
                 <v-icon large color="mr-2" @click="viewFile(item)">mdi-eye</v-icon>
             </template>
+
+            <v-input v-model="copyText" hidden></v-input>
         </v-data-table>
     </v-container>
 </template>
 
 <script>
 import MimeTypes from "../../plugins/mimetypes";
+import { text } from "body-parser";
 
 export default {
     name: "file-list",
@@ -85,8 +93,9 @@ export default {
             },
             error: "",
             selected: [],
-            modes: ["download", "edit", "delete"],
-            mobile: null
+            modes: ["download", "edit", "delete", "copy-link"],
+            mobile: null,
+            copyText: null
         };
     },
     computed: {
@@ -165,6 +174,7 @@ export default {
 
             return items;
         },
+
         fileOperation(mode, data) {
             if (this.modes.includes(mode)) {
                 if (!data) {
@@ -172,14 +182,20 @@ export default {
                 }
 
                 switch (mode) {
-                    case "preview":
-                        this.preview = {
-                            open: true,
-                            url: `/api/v1/user/file/${
-                                this.getIdsFromObject(data)[0]
-                            }`,
-                            mime: data.upload_mime
-                        };
+                    case "copy-link":
+                        let input = document.createElement("input");
+                        input.id = "copy-text";
+                        input.value = data.upload_url;
+
+                        try {
+                            document.querySelector("#app").appendChild(input);
+                            input.select();
+                            document.execCommand("copy");
+                        } catch (ex) {
+                            console.error(ex);
+                        }
+                        
+                        input.remove();
                         break;
                     default:
                         this.$store
@@ -198,6 +214,7 @@ export default {
                 }
             }
         },
+
         getFiles() {
             this.error = "";
 
@@ -211,6 +228,7 @@ export default {
                     setTimeout(() => (this.loading = false), 1000);
                 });
         },
+
         viewFile(item) {
             console.log(item);
             this.$router.push({
@@ -218,13 +236,17 @@ export default {
                 params: { file: item.id, mime: item.upload_mime }
             });
         },
+
         onResize() {
             this.mobile = window.innerWidth < 940;
         },
+
         getMimeIcon(mime) {
             try {
                 console.log(mime, MimeTypes[mime]);
-                return MimeTypes.hasOwnProperty(mime) ? MimeTypes[mime] : "help-circle-outline";
+                return MimeTypes.hasOwnProperty(mime)
+                    ? MimeTypes[mime]
+                    : "help-circle-outline";
             } catch (e) {
                 return "help-circle-outline";
             }
