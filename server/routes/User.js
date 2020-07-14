@@ -111,9 +111,10 @@ class User extends RouteBase {
     }
 
     async getFiles(req, res) {
+        let errors = [];
         let options = {};
         if (req.params.id) {
-            options.id = req.params.id;
+            options[`${process.env.UPLOAD_TABLE_V1}.id`] = req.params.id;
         }
 
         let files = await database.select({
@@ -135,16 +136,18 @@ class User extends RouteBase {
         })
             .catch((error) => {
                 console.error(error);
-                res.status(500).send({
-                    status: 500,
-                    message: "Internal server error"
-                });
+                errors.push(error);
             });
 
         if (files) {
             res.status(200).send({
                 status: 200,
                 data: [...files]
+            });
+        } else if (errors.length > 0) {
+            res.status(500).send({
+                status: 500,
+                message: "Internal server error"
             });
         } else {
             res.status(204).send({

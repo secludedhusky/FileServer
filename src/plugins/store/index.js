@@ -71,7 +71,7 @@ export default new Vuex.Store({
             }
 
             if (self.$router.history.current.name !== "login" && self.$router.history.current.name !== "home") {
-                self.$router.push("login");
+                self.$router.push({ path: "/login" });
             }
         },
 
@@ -241,9 +241,9 @@ export default new Vuex.Store({
 
         },
 
-        getFiles({ commit }, self) {
+        getFiles({ commit }, payload) {
             return new Promise(async (resolve, reject) => {
-                let response = await fetch(`${process.env.API_URI_V1}/user/files`)
+                let response = await fetch(`${process.env.API_URI_V1}/user/files${payload.fileId ? "/" + payload.fileId : ""}`);
 
                 if (response.ok) {
                     let data = await response.json()
@@ -256,7 +256,7 @@ export default new Vuex.Store({
                 } else {
                     switch (response.status) {
                         case 401:
-                            commit("noAuth", self);
+                            commit("noAuth", payload.self);
                             break;
                         default:
                             console.error("Unknown status");

@@ -194,7 +194,7 @@ export default {
                         } catch (ex) {
                             console.error(ex);
                         }
-                        
+
                         input.remove();
                         break;
                     default:
@@ -219,7 +219,7 @@ export default {
             this.error = "";
 
             this.$store
-                .dispatch("getFiles", this)
+                .dispatch("getFiles", { self: this })
                 .then(() => {
                     setTimeout(() => (this.loading = false), 1000);
                 })

@@ -49,7 +49,7 @@ export default new VueRouter({
             component: Dashboard
         },
         {
-            path: '/dashboard/view-file',
+            path: '/dashboard/view/:file',
             name: 'view-file',
             component: File
         }
