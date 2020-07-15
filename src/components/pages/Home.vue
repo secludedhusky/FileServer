@@ -2,19 +2,16 @@
     <v-container>
         <h1>Home</h1>
         <home-form></home-form>
-        <stats-list></stats-list>
     </v-container>
 </template>
 
 <script>
-import StatsList from "../lists/StatsList.vue";
 import HomeForm from "../forms/HomeForm.vue";
 
 export default {
     name: "home",
     components: {
         HomeForm,
-        StatsList
     }
 };
 </script>
