@@ -84,7 +84,8 @@ export default new Vuex.Store({
                 files: [],
             }
 
-            if (self.$router.history.current.name !== "login" && self.$router.history.current.name !== "home") {
+            let blocked = ["login", "register", "home"]
+            if (!blocked.includes(self.$router.history.current.name)) {
                 self.$router.push({ path: "/login" });
             }
         },

@@ -1,6 +1,5 @@
 <template>
     <v-container>
-        <h1>Login</h1>
         <login-form></login-form>
     </v-container>
 </template>
