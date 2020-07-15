@@ -1,11 +1,6 @@
 <template>
     <v-row justify="center">
-        <v-dialog
-            v-model="this.$store.getters.editorState.open"
-            fullscreen
-            hide-overlay
-            transition="dialog-bottom-transition"
-        >
+        <v-dialog v-model="this.$store.getters.editorState.open" fullscreen hide-overlay transition="dialog-bottom-transition">
             <v-card>
                 <v-toolbar dark color="primary">
                     <v-btn icon dark @click="closeEditor('cancel')">
@@ -49,7 +44,7 @@ export default {
     data() {
         return {
             file: {}
-        }
+        };
     },
     methods: {
         closeEditor() {

@@ -28,7 +28,7 @@ export default {
     name: "user-profile",
     methods: {
         logout() {
-            this.$router.push('logout');
+            this.$router.push("logout");
         }
     }
 };

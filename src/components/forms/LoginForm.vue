@@ -6,25 +6,28 @@
                     <v-alert type="error">{{ error }}</v-alert>
                 </v-col>
             </v-row>
-
             <v-row>
                 <v-col cols="12" sm="6">
                     <v-text-field v-model="username" label="Username" type="text" filled></v-text-field>
                 </v-col>
-
                 <v-col cols="12" sm="6">
                     <v-text-field v-model="password" label="Password" type="password" filled></v-text-field>
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="12" sm="12">
-                    <v-btn
-                        :loading="loading"
-                        :disabled="loading"
-                        color="secondary"
-                        block
-                        @click="loader = 'loading'; login();"
-                    >
+                <v-col cols="12" sm="4"></v-col>
+                <v-col cols="12" sm="2">
+                    <v-btn block tile outlined>
+                        Forgot Password
+                        <template v-slot:loader>
+                            <span class="custom-loader">
+                                <v-icon light>cached</v-icon>
+                            </span>
+                        </template>
+                    </v-btn>
+                </v-col>
+                <v-col cols="12" sm="2">
+                    <v-btn :loading="loading" :disabled="loading" color="success" tile block @click="loader = 'loading'; login();">
                         Login
                         <template v-slot:loader>
                             <span class="custom-loader">
@@ -33,6 +36,7 @@
                         </template>
                     </v-btn>
                 </v-col>
+                <v-col cols="12" sm="4"></v-col>
             </v-row>
         </v-container>
     </v-form>

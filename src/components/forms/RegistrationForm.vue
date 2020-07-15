@@ -15,48 +15,20 @@
 
             <v-row>
                 <v-col cols="12" sm="12">
-                    <v-text-field
-                        v-model="email"
-                        :rules="emailRules"
-                        :error-messages="emailError"
-                        label="Email"
-                        type="email"
-                        filled
-                        @change="resetValidation('email')"
-                    ></v-text-field>
+                    <v-text-field v-model="email" :rules="emailRules" :error-messages="emailError" label="Email" type="email" filled @change="resetValidation('email')"></v-text-field>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col cols="12" sm="6">
-                    <v-text-field
-                        v-model="username"
-                        :rules="usernameRules"
-                        :error-messages="usernameError"
-                        label="Username"
-                        type="text"
-                        filled
-                        @change="resetValidation('username')"
-                    ></v-text-field>
+                    <v-text-field v-model="username" :rules="usernameRules" :error-messages="usernameError" label="Username" type="text" filled @change="resetValidation('username')"></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6">
-                    <v-text-field
-                        :rules="passwordRules"
-                        v-model="password"
-                        label="Password"
-                        type="password"
-                        filled
-                    ></v-text-field>
+                    <v-text-field :rules="passwordRules" v-model="password" label="Password" type="password" filled></v-text-field>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col cols="12" sm="12">
-                    <v-btn
-                        :loading="loading"
-                        :disabled="!valid || loading"
-                        color="secondary"
-                        block
-                        @click="loader = 'loading'; register()"
-                    >
+                    <v-btn :loading="loading" :disabled="!valid || loading" color="secondary" block @click="loader = 'loading'; register()">
                         Regsiter
                         <template v-slot:loader>
                             <span class="custom-loader">

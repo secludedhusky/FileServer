@@ -3,13 +3,7 @@
         <v-layout column>
             <v-subheader>
                 Server Statistics
-                <v-btn
-                    :loading="loading"
-                    :disabled="loading"
-                    icon
-                    color="green"
-                    @click="loader = 'loading'; getStats()"
-                >
+                <v-btn :loading="loading" :disabled="loading" icon color="green" @click="loader = 'loading'; getStats()">
                     <v-icon>mdi-cached</v-icon>
                     <template v-slot:loader>
                         <span class="custom-loader">
@@ -25,14 +19,7 @@
                 </v-col>
             </v-row>
 
-            <v-data-table
-                loading-text="Please wait..."
-                :loading="loading"
-                :headers="headers"
-                :items="this.$store.getters.getStats"
-                :hide-default-footer="true"
-                class="elevation-1"
-            ></v-data-table>
+            <v-data-table loading-text="Please wait..." :loading="loading" :headers="headers" :items="this.$store.getters.getStats" :hide-default-footer="true" class="elevation-1"></v-data-table>
         </v-layout>
     </v-container>
 </template>

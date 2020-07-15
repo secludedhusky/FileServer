@@ -6,12 +6,7 @@
                     <transition name="fade" mode="out-in">
                         <v-navigation-drawer v-model="drawer" app clipped>
                             <v-list dense>
-                                <v-list-item
-                                    link
-                                    v-for="(item, index) in links"
-                                    :key="index"
-                                    :to="item.path"
-                                >
+                                <v-list-item link v-for="(item, index) in links" :key="index" :to="item.path">
                                     <v-list-item-action>
                                         <v-icon>{{ item.icon }}</v-icon>
                                     </v-list-item-action>

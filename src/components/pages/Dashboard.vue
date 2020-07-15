@@ -1,12 +1,10 @@
 <template>
-    <v-container
-        v-touch="{
+    <v-container v-touch="{
             left: () => swipe('Left'),
             right: () => swipe('Right'),
             up: () => swipe('Up'),
             down: () => swipe('Down')
-        }"
-    >
+        }">
         <h1>Dashboard</h1>
         <v-container fluid>
             <user-profile></user-profile>
