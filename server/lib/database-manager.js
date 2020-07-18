@@ -1,6 +1,5 @@
 const mysql = require("mysql");
-const { query } = require("express");
-const { response } = require("express");
+const { v4: uuid } = require("uuid");
 
 /**
  * Database Manager
@@ -16,6 +15,8 @@ class DatabaseManager {
      * @param {string} database | Database to use
      */
     constructor(hostname, username, password, database) {
+        this.instance = uuid();
+
         this.pool = mysql.createPool({
             host: hostname,
             user: username,
@@ -23,6 +24,19 @@ class DatabaseManager {
             database: database,
             port: 3306,
             multipleStatements: true
+        });
+
+        this.pool.on('acquire', (connection) => {
+            console.log(`[I-${this.instance}] Connection ${connection.threadId} acquired`);
+        });
+        this.pool.on('connection', (connection) => {
+            connection.query(`[I-${this.instance}] Connected ${connection.threadId}`)
+        });
+        this.pool.on('enqueue', () => {
+            console.log(`[I-${this.instance}] Waiting for available connection slot`);
+        });
+        this.pool.on('release', (connection) => {
+            console.log(`[I-${this.instance}] Connection ${connection.threadId} released`);
         });
     }
 
@@ -61,6 +75,7 @@ class DatabaseManager {
             table = options.from,
             where = options.where || undefined,
             join = options.join || undefined,
+            sort = options.sort || undefined,
             first = false;
 
         if (options.options) {
@@ -72,6 +87,7 @@ class DatabaseManager {
             let selectStatement = "";
             let joinStatement = "";
             let groupStatement = "";
+            let sortStatement = "";
 
             if (where) {
                 selectStatement += "WHERE ?";
@@ -107,13 +123,17 @@ class DatabaseManager {
                 groupStatement = ` GROUP BY ${join.groupBy} `;
             }
 
+            if (sort) {
+                sortStatement = ` ORDER BY ${sort.by} ${sort.mode}`;
+            }
+
             let connection = await this.getConnection()
                 .catch((error) => {
                     reject(error);
                 });
 
             if (connection) {
-                connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement}`, tableParams, function (error, results, fields) {
+                connection.query(`SELECT ${columns} FROM ?? ${joinStatement} ${selectStatement} ${groupStatement} ${sortStatement}`, tableParams, function (error, results, fields) {
                     if (error) {
                         reject(error);
                     }

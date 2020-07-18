@@ -132,6 +132,10 @@ class User extends RouteBase {
                 from: { id: "id" },
                 on: { table: process.env.VIEW_TABLE_V1, id: "view_id" },
                 groupBy: `${process.env.UPLOAD_TABLE_V1}.id`
+            },
+            sort: {
+                by: `${process.env.UPLOAD_TABLE_V1}.upload_date`,
+                mode: "DESC"
             }
         })
             .catch((error) => {
