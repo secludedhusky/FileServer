@@ -4,13 +4,7 @@
             <v-row sm="6">
                 <v-subheader>
                     My Files
-                    <v-btn
-                        :loading="loading"
-                        :disabled="loading"
-                        icon
-                        color="green"
-                        @click="loader = 'loading'; getFiles()"
-                    >
+                    <v-btn :loading="loading" :disabled="loading" icon color="green" @click="loader = 'loading'; getFiles()">
                         <v-icon>mdi-cached</v-icon>
                         <template v-slot:loader>
                             <span class="custom-loader">
@@ -18,28 +12,13 @@
                             </span>
                         </template>
                     </v-btn>
-                    <v-btn
-                        @click="fileOperation('download')"
-                        v-if="selected.length > 0"
-                        icon
-                        color="green"
-                    >
+                    <v-btn @click="fileOperation('download')" v-if="selected.length > 0" icon color="green">
                         <v-icon>mdi-download</v-icon>
                     </v-btn>
-                    <v-btn
-                        @click="fileOperation('edit')"
-                        v-if="selected.length > 0"
-                        icon
-                        color="green"
-                    >
+                    <v-btn @click="fileOperation('edit')" v-if="selected.length > 0" icon color="green">
                         <v-icon>mdi-pencil</v-icon>
                     </v-btn>
-                    <v-btn
-                        @click="fileOperation('delete')"
-                        v-if="selected.length > 0"
-                        icon
-                        color="red"
-                    >
+                    <v-btn @click="fileOperation('delete')" v-if="selected.length > 0" icon color="red">
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
                 </v-subheader>
@@ -61,30 +40,21 @@
             loading-text="Please wait..."
             v-resize="onResize"
         >
-            <template v-if="!isMobile" v-slot:item.upload_filename="{ item }">
+            <template v-slot:item.upload_filename="{ item }">
                 <v-btn v-on:click="viewFile(item)" text small>
                     <v-icon left dark>mdi-{{ getMimeIcon(item.upload_mime )}}</v-icon>
                     {{ item.upload_filename }}
                 </v-btn>
-            </template>
-            <template v-else v-slot:item.upload_filename="{ item }">
-                <v-icon left dark>mdi-{{ getMimeIcon(item.upload_mime )}}</v-icon>
-                {{ item.upload_filename }}
             </template>
 
             <template v-slot:item.upload_date="{ item }">
                 <span>{{ moment(item.upload_date).fromNow() }}</span>
             </template>
 
-            <template v-if="!isMobile" v-slot:item.actions="{ item }">
+            <template v-slot:item.actions="{ item }">
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-icon
-                            v-on="on"
-                            medium
-                            class="mr-2"
-                            @click="fileOperation('copy-link', item)"
-                        >mdi-content-copy</v-icon>
+                        <v-icon v-on="on" medium class="mr-2" @click="fileOperation('copy-link', item)">mdi-content-copy</v-icon>
                     </template>
                     <span>Copy Link</span>
                 </v-tooltip>
@@ -92,51 +62,28 @@
                 <v-snackbar color="success" v-model="copied.done">
                     Link for "{{ copied.name }}" copied.
                     <template v-slot:action="{ attrs }">
-                        <v-btn
-                            color="secondary"
-                            text
-                            v-bind="attrs"
-                            @click="copied.done = false; copied.name = null;"
-                        >Close</v-btn>
+                        <v-btn color="secondary" text v-bind="attrs" @click="copied.done = false; copied.name = null;">Close</v-btn>
                     </template>
                 </v-snackbar>
 
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-icon
-                            v-on="on"
-                            medium
-                            class="mr-2"
-                            @click="fileOperation('download', item)"
-                        >mdi-download</v-icon>
+                        <v-icon v-on="on" medium class="mr-2" @click="fileOperation('download', item)">mdi-download</v-icon>
                     </template>
                     <span>Download File</span>
                 </v-tooltip>
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-icon
-                            v-on="on"
-                            medium
-                            class="mr-2"
-                            @click="fileOperation('edit', item)"
-                        >mdi-pencil</v-icon>
+                        <v-icon v-on="on" medium class="mr-2" @click="fileOperation('edit', item)">mdi-pencil</v-icon>
                     </template>
                     <span>Edit File Settings</span>
                 </v-tooltip>
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-icon
-                            v-on="on"
-                            medium
-                            color="red"
-                            @click="fileOperation('delete', item)"
-                        >mdi-delete</v-icon>
+                        <v-icon v-on="on" medium color="red" @click="fileOperation('delete', item)">mdi-delete</v-icon>
                     </template>
                     <span>Delete File</span>
                 </v-tooltip>
-            </template>
-            <template v-else v-slot:item.actions="{ item }">
-                <v-icon large color="mr-2" @click="viewFile(item)">mdi-eye</v-icon>
             </template>
 
             <v-input v-model="copyText" hidden></v-input>
@@ -157,50 +104,50 @@ export default {
             loading: true,
             copied: {
                 done: false,
-                name: null
+                name: null,
             },
             preview: {
                 open: false,
                 url: null,
-                mime: null
+                mime: null,
             },
             error: "",
             selected: [],
             modes: ["download", "edit", "delete", "copy-link"],
             mobile: null,
-            copyText: null
+            copyText: null,
         };
     },
     created() {
         this.getFiles();
     },
     components: {
-        FileEditor
+        FileEditor,
     },
     computed: {
         headers() {
             let headers = [
-                { text: "File Name", align: "start", value: "upload_filename" }
+                { text: "File Name", align: "start", value: "upload_filename" },
             ];
 
             if (!this.isMobile) {
                 headers.push({
                     text: "Views",
                     value: "upload_views",
-                    sortable: true
+                    sortable: true,
                 });
             }
 
             headers.push({
                 text: "Uploaded",
                 value: "upload_date",
-                sortable: true
+                sortable: true,
             });
             headers.push({
                 text: "Actions",
                 value: "actions",
                 sortable: false,
-                align: "right"
+                align: "right",
             });
 
             return headers;
@@ -208,7 +155,7 @@ export default {
         isMobile() {
             this.mobile = window.innerWidth < 940;
             return this.mobile;
-        }
+        },
     },
     watch: {
         loader() {
@@ -216,14 +163,14 @@ export default {
             this[l] = !this[l];
 
             this.loader = null;
-        }
+        },
     },
     methods: {
         getIdsFromObject(data) {
             let items = [];
 
             if (Array.isArray(data)) {
-                items = data.map(item => {
+                items = data.map((item) => {
                     return item.id;
                 });
             } else {
@@ -236,7 +183,7 @@ export default {
             let items = [];
 
             if (Array.isArray(data)) {
-                items = data.map(item => {
+                items = data.map((item) => {
                     return item.upload_url;
                 });
             } else {
@@ -276,9 +223,9 @@ export default {
                             .dispatch("fileOperation", {
                                 mode: mode,
                                 data: this.getIdsFromObject(data),
-                                self: this
+                                self: this,
                             })
-                            .catch(error => {
+                            .catch((error) => {
                                 this.error =
                                     "File operation failed, please try again later.";
                                 setTimeout(() => (this.loading = false), 1000);
@@ -305,7 +252,7 @@ export default {
         viewFile(item) {
             this.$router.push({
                 name: `view-file`,
-                params: { file: item.id, mime: item.upload_mime }
+                params: { file: item.id, mime: item.upload_mime },
             });
         },
 
@@ -321,8 +268,8 @@ export default {
             } catch (e) {
                 return "help-circle-outline";
             }
-        }
-    }
+        },
+    },
 };
 </script>
 
